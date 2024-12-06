@@ -18,7 +18,8 @@ class CartItemFactory extends Factory
     {
         return [
             'cart_id' => fake()->numberBetween(1, 4),
-            'menu_item_id' => fake()->numberBetween(1, 100),
+            'menu_item_id' => fake()->unique()->numberBetween(1, 25),
+            'size_id' => fake()->numberBetween(1, 2),
             'quantity' => fake()->numberBetween(1, 5)
         ];
     }

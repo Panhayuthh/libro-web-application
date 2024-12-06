@@ -15,7 +15,8 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade')->onUpdate('cascade');
             $table->foreignId('cart_id')->constrained()->onDelete('cascade')->onUpdate('cascade');
-            $table->foreignId('status_id')->constrained()->onDelete('cascade')->onUpdate('cascade');
+            $table->integer('status_id')
+            ->comment('1: Ordered Confirmed, 2: Preparing, 3: Out for delivery, 4: paid, 5: delivered, 6: ready for pickup, 7: cancelled');
             $table->decimal('total', 8, 2);
             $table->timestamps();
         });

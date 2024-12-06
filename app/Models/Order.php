@@ -16,10 +16,6 @@ class Order extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function status() {
-        return $this->belongsTo(Status::class);
-    }
-
     public function cart() {
         return $this->belongsTo(Cart::class);
     }

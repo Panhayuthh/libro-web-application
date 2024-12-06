@@ -22,8 +22,6 @@ class DatabaseSeeder extends Seeder
         User::factory(10)->create();
         
         $this->call([
-            CategorySeeder::class,
-            StatusSeeder::class,
             MenuItemSeeder::class,
             CartSeeder::class,
             CartItemSeeder::class,
