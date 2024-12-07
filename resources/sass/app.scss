@@ -4,5 +4,13 @@
 // // Variables
 // @import 'variables';
 
+//custom
+@import 'custom';
+
 // Bootstrap
 @import 'bootstrap/scss/bootstrap';
+@import 'bootstrap-icons/font/bootstrap-icons.css';
+
+// CoreUI
+@import "@coreui/coreui/scss/coreui";
+@import "@coreui/icons/css/free.min.css";
