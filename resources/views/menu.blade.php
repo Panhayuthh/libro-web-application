@@ -10,24 +10,38 @@
 
 {{-- @dd($menuItems) --}}
 
-<div class="row g-3">
+<div class="row justify-content-center g-3">
     @foreach ($menuItems as $item)
-    <div class="col-6"> 
-        <div class="card h-100 shadow-sm" style="max-width: 540px;">
-            <div class="class row g-0">
-                <div class="col-md-4 p-3">
-                    <div class="card h-100 position-relative">
+    @auth
+    <div class="col-5"> 
+    @endauth
+    @guest
+    <div class="col-4">
+    @endguest
+        <div class="card h-100 shadow-sm">
+            <form class="row p-3 m-0" action="{{ route('createCartItem') }}" method="post">
+                @csrf
+                @auth
+                <input type="hidden" name="menu_item_id" value="{{ $item->id }}">
+                <input type="hidden" name="cart_id" value="{{ $cart->id }}">
+                <input type="hidden" name="quantity" value="1">
+                @endauth
+                {{-- left column --}}
+                <div class="col-4 ps-0">
+                    <div class="card h-100 border-0">
                         <img src="https://via.placeholder.com/350x350?text=Image" class="card-img h-100 w-100 object-fit-cover">
-                        <div class="position-absolute bottom-0 start-0 end-0 p-2 d-flex justify-content-center align-items-center">
-                            <button class="button-minus border-0 rounded-circle d-flex justify-content-center align-items-center p-1 icon-shape icon-sm me-1" style="width: 30px; height: 30px;">-</button>
-                            <span class="fw-bold mx-2">1</span>
-                            <button class="button-plus border-0 rounded-circle d-flex justify-content-center align-items-center p-1 icon-shape icon-sm ms-1" style="width: 30px; height: 30px;" value="-">+</button>
+                        <div class="pt-2 input-group w-auto justify-content-center align-items-center">
+                            <input type="button" value="-" class="button-minus border rounded-circle icon-shape icon-sm" data-field="quantity">
+                            <input type="number" step="1" max="10" value="1" name="quantity" class="quantity-field border-0 mx-1 text-center w-25">
+                            <input type="button" value="+" class="button-plus border rounded-circle icon-shape icon-sm " data-field="quantity">
                         </div>
                     </div>
                 </div>
-                <div class="col-md-8">
-                    <div class="card border-0 h-100 d-flex flex-column">
-                        <div class="card-body d-flex flex-column">
+    
+                {{-- right column --}}
+                <div class="col-8">
+                    <div class="card border-0 d-flex flex-column">
+                        <div class="card-body p-0 d-flex flex-column">
                             <!-- Content -->
                             <div class="mb-3">
                                 <h5 class="card-title d-flex justify-content-between align-items-center">
@@ -44,37 +58,28 @@
                                     {{ $item->description }}
                                 </p>
                             </div>
+                        </div>
                             
-                            <!-- Button Section - Always at the bottom -->
-                            <div class="mt-auto">
-                                <form class="m-0" action="{{ route('createCartItem') }}" method="post">
-                                    @csrf
-                                    <div class="row mb-3">
-                                        <label class="col-auto fw-bold">Size</label>
-                                        <div class="col-8 d-flex justify-content-center">
-                                            <div class="btn-group" role="group" aria-label="Basic radio toggle button group">
-                                                <input type="radio" class="btn-check" name="size" id="size1" value="small" checked>
-                                                <label class="btn btn-outline-secondary rounded-pill" for="size1">Small</label>
-                                            </div>
-                                            <div class="btn-group ms-3" role="group" aria-label="Basic radio toggle button group">
-                                                <input type="radio" class="btn-check" name="size" id="size2" value="large">
-                                                <label class="btn btn-outline-secondary rounded-pill" for="size2">Large</label>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    @auth
-                                    <input type="hidden" name="menu_item_id" value="{{ $item->id }}">
-                                    <input type="hidden" name="cart_id" value="{{ $cart->id }}">
-                                    <input type="hidden" name="quantity" value="1">
-                                    @endauth
-                                    <x-button-pill class="btn-primary w-100" type="submit">Add to Cart</x-button-pill>
-                                </form>
+                        {{-- size selector --}}
+                        <div class="row align-items-center mt-auto">
+                            <h6 class="col-auto fw-bold m-0">Size:</h6>
+                            <div class="col d-flex justify-content-center">
+                                <div class="btn-group" role="group" aria-label="Basic radio toggle button group">
+                                    <input type="radio" class="btn-check" name="size_{{ $item->id }}" id="size_small_{{ $item->id }}" value="small" checked>
+                                    <label class="btn btn-outline-secondary rounded-pill" for="size_small_{{ $item->id }}">Small</label>
+                                </div>
+                                <div class="btn-group ms-3" role="group" aria-label="Basic radio toggle button group">
+                                    <input type="radio" class="btn-check" name="size_{{ $item->id }}" id="size_large_{{ $item->id }}" value="large">
+                                    <label class="btn btn-outline-secondary rounded-pill" for="size_large_{{ $item->id }}">Large</label>
+                                </div>
                             </div>
                         </div>
-                    </div>                                                      
+
+                        <x-button-pill class="mt-3 btn-primary w-100" type="submit">Add to Cart</x-button-pill>
+                    </div>
                 </div>
-            </div>
-        </div>    
+            </form>
+        </div>
     </div>
     @endforeach
 </div>
