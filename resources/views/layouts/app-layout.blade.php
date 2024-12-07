@@ -16,7 +16,7 @@
         <div class="row">
             @hasSection('sidebar-main')
                 <main class="col-9 p-0">
-                    <div class="container-fluid px-5">
+                    <div class="container-fluid px-5 pb-5">
                         @yield('content')
                     </div>
                 </main>
