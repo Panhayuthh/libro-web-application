@@ -162,16 +162,22 @@ input[type="number"] {
 
 //progression bar
 .step-circle {
-    width: 30px;
-    height: 30px;
+    width: 40px;
+    height: 40px;
     border-radius: 50%;
     background-color: #fff;
     border: 2px solid #007bff;
-    line-height: 30px;
-    font-weight: bold;
+    // line-height: 30px;
+    // font-weight: bold;
+    font-size: 1.5rem;
     display: flex;
     align-items: center;
     justify-content: center;
     margin-bottom: 10px;
     cursor: pointer; /* Added cursor pointer */
+  }
+
+.step-success {
+    background-color: #28a745;
+    border-color: #28a745;
   }

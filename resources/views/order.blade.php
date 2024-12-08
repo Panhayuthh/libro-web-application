@@ -7,35 +7,18 @@
     {{-- @dd($orders); --}}
 
     @foreach ($orders as $order)
-    @switch($order->status_id)
-        @case(1)
-            @php $status = 'Received'; @endphp
-            @break
-        @case(2)
-            @php $status = 'Confirmed'; @endphp
-            @break
-        @case(3)
-            @php $status = 'Preparing'; @endphp
-            @break
-        @case(4)
-            @php $status = 'Delivering'; @endphp
-            @break
-        @case(5)
-            @php $status = 'Delivered'; @endphp
-            @break
-        @case(6)
-            @php $status = 'Cancelled'; @endphp
-            @break
-        @case(7)
-            @php $status = 'Refunded'; @endphp
-            @break
-        @case(8)
-            @php $status = 'Ready for pick-up'; @endphp
-            @break
-        @default
-            @php $status = 'Encountered some problems'; @endphp
-            @break
-    @endswitch
+    @php
+        $statuses = [
+            1 => 'Received',
+            2 => 'Confirmed',
+            3 => 'Preparing',
+            4 => 'Delivering',
+            5 => 'Delivered',
+        ];
+
+        $status = $statuses[$order->status_id] ?? 'Encountered some problems';
+        $progressPercentage = min(($order->status_id / 5) * 100, 100);
+    @endphp
 
     <div class="card mt-5">
         <div class="row">
@@ -61,31 +44,62 @@
             <h5 class="card-title mx-3"> Tracking History </h5>
 
             <div id="container" class="container mt-5">
-                <div class="progress px-1" style="height: 5px;">
-                  <div class="progress-bar" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                <div class="progress" style="height: 5px;">
+                    <div class="progress-bar bg-success" role="progressbar" 
+                    style="width: {{ $progressPercentage }}%;" 
+                    aria-valuenow="{{ $progressPercentage }}" 
+                    aria-valuemin="0" 
+                    aria-valuemax="100">
+               </div>
                 </div>
                 <div class="step-container d-flex justify-content-between"
                     style="
                         position: relative;
                         text-align: center;
-                        transform: translateY(-43%);">
-                        
-                    <div class="step-circle">1</div>
-                    <div class="step-circle">2</div>
-                    <div class="step-circle">3</div>
-                    <div class="step-circle">4</div>
-                    <div class="step-circle">5</div>
-                </div>
-                <div class="step-container d-flex justify-content-between"
-                style="
-                    position: relative;
-                    text-align: center;
-                    transform: translateY(-43%);">
-                    <div class="step-text">Received</div>
-                    <div class="step-text">Confirmed</div>
-                    <div class="step-text">Preparing</div>
-                    <div class="step-text">Delivering</div>
-                    <div class="step-text">Delivered</div>
+                        transform: translateY(-33%);">
+                    
+                    @foreach ($statuses as $id => $text)
+                        <div class="step-outer d-flex flex-column align-items-center">
+                            @if ($order->status_id >= $id)
+                                <div class="step-circle step-success">
+                                    <i class="cil-check-alt text-light"></i>
+                                </div>
+                            @else
+                                @switch($id)
+                                    @case(1)
+                                        <div class="step-circle">
+                                            <i class="cil-clipboard"></i>
+                                        </div>
+                                        @break
+                                    @case(2)
+                                        <div class="step-circle">
+                                            <i class="cil-check-circle"></i>
+                                        </div>
+                                        @break
+                                    @case(3)
+                                        <div class="step-circle">
+                                            <i class="cil-cog"></i>
+                                        </div>
+                                        @break
+                                    @case(4)
+                                        <div class="step-circle">
+                                            <i class="cil-truck"></i>
+                                        </div>
+                                        @break
+                                    @case(5)
+                                        <div class="step-circle">
+                                            <i class="cil-location-pin"></i>
+                                        </div>
+                                        @break
+                                    @default
+                                        <div class="step-circle">
+                                            <i class="cil-ban"></i>
+                                        </div>
+                                @endswitch
+                            @endif
+                            <div class="step-text">{{ $text }}</div>
+                        </div>
+                    @endforeach
                 </div>
             </div>
         </div>
