@@ -14,9 +14,11 @@ return new class extends Migration
         Schema::create('orders', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade')->onUpdate('cascade');
-            $table->foreignId('cart_id')->constrained()->onDelete('cascade')->onUpdate('cascade');
+            $table->integer('delivery_id')
+            ->comment('1: Delivery, 2: Pickup');
             $table->integer('status_id')
-            ->comment('1: Ordered Confirmed, 2: Preparing, 3: Out for delivery, 4: paid, 5: delivered, 6: ready for pickup, 7: cancelled');
+            ->comment('1: Received, 2: Confirmed, 3: Preparing, 4: Delivering, 5: Delivered, 6: Canceled, 7: Refunded, 8: Ready for Pickup')
+            ->default(1);
             $table->decimal('total', 8, 2);
             $table->timestamps();
         });

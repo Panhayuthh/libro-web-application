@@ -16,8 +16,6 @@ Route::get('/home', function () {
     return view('home');
 })->name('home');
 
-Route::get('/order', [OrderController::class, 'index'])->name('order');
-
 Route::get('/history', [OrderController::class, 'history'])->name('history');
 
 Route::group(['prefix' => 'auth'], function () {
@@ -34,9 +32,20 @@ Route::group(['prefix' => 'menu'], function () {
     Route::post('/cart', [CartController::class, 'createCartItem'])
             // ->middleware('can:add-to-cart')
             ->name('createCartItem');
-    Route::delete('/cart/{cartItem}', [CartController::class, 'destroyCartItem'])
+    Route::patch('/cart/{cartItem}', [CartController::class, 'updateCartItem'])
+            ->middleware('can:add-to-cart')
+            ->name('updateCartItem');
+    Route::delete('/cart/{cart}', [CartController::class, 'destroyCart'])
+            ->middleware('can:add-to-cart')
+            ->name('destroyCart');
+    Route::delete('/cart/item/{cartItem}', [CartController::class, 'destroyCartItem'])
             ->middleware('can:add-to-cart')
             ->name('destroyCartItem');
+});
+
+Route::group(['prefix' => 'order'], function () {
+    Route::get('/', [OrderController::class, 'index'])->name('order');
+    Route::post('/', [OrderController::class, 'store'])->name('order.store');
 });
 
 Route::group(['prefix' => 'admin'], function() {

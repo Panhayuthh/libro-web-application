@@ -19,7 +19,7 @@ class OrderFactory extends Factory
         return [
             'user_id' => fake()->numberBetween(1, 10),
             'status_id' => fake()->numberBetween(1, 7),
-            'cart_id' => fake()->numberBetween(1, 4),
+            'delivery_id' => fake()->numberBetween(1, 2),
             'total' => fake()->randomFloat(2, 1, 1000)
         ];
     }

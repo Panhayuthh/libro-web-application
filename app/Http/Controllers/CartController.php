@@ -4,10 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Models\Cart;
 use App\Models\CartItem;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
-
+use Illuminate\Database\QueryException;
 class CartController extends Controller
 {
     public function show() {
@@ -47,44 +48,69 @@ class CartController extends Controller
         return $cart;
     }
 
+
+
     public function createCartItem(Request $request)
     {
         // dd($request->all());
-
+    
         if (Gate::denies('add-to-cart')) {
             return redirect()->route('login');
         }
-
+    
         $cart = Cart::where('user_id', Auth::id())->first();
-
+    
         if (!$cart) {
             $cart = $this->createCart(Auth::id());
         }
-
+    
         $cartItem = new CartItem();
         $cartItem->cart_id = $cart->id;
         $cartItem->menu_item_id = $request->menu_item_id;
         $cartItem->quantity = $request->quantity;
-        $cartItem->size_id = ($request->size === 'small' ? '1' : '2');
-        $cartItem->save();
-
+        $cartItem->size_id = $request->size_id;
+    
+        try {
+            $cartItem->save();
+        } catch (QueryException $e) {
+            if ($e->getCode() == '23000') {
+                return back()->with(['error' => 'This item with the selected size is already in the cart.']);
+            }
+            
+            throw $e;
+        }
+    
         return redirect()->route('menu');
     }
 
-    public function destroyCartItem(CartItem $cartItem)
+    public function destroyCart($id)
     {
-        // dd($cartItem->id);
-
-        if (Gate::denies('add-to-cart')) {
-            return redirect()->route('login');
-        }
-        
         try {
-            $cartItem->delete();
+            $cart = Cart::findOrFail($id);
+    
+            $cart->delete();
+    
+            return response('Cart removed successfully', 200);
+        } catch (ModelNotFoundException $e) {
+            return response($e->getMessage(), 404);
         } catch (\Exception $e) {
-            dd($e->getMessage());
+            return response($e->getMessage(), 500);
         }
+    }
+    
 
-        return back();
-    }   
+    public function destroyCartItem($id)
+    {
+        try {
+            $cartItem = CartItem::findOrFail($id);
+    
+            $cartItem->delete();
+    
+            return response('Cart item removed successfully', 200);
+        } catch (ModelNotFoundException $e) {
+            return response($e->getMessage(), 404);
+        } catch (\Exception $e) {
+            return response($e->getMessage(), 500);
+        }
+    }    
 }
