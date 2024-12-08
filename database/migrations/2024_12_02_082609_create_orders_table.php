@@ -17,7 +17,7 @@ return new class extends Migration
             $table->integer('delivery_id')
             ->comment('1: Delivery, 2: Pickup');
             $table->integer('status_id')
-            ->comment('1: Received, 2: Confirmed, 3: Preparing, 4: Delivering, 5: Delivered, 6: Canceled, 7: Refunded, 9: Ready for Pickup')
+            ->comment('1: Received, 2: Confirmed, 3: Preparing, 4: Delivering, 5: Delivered, 6: Canceled, 7: Refunded, 8: Ready for Pickup')
             ->default(1);
             $table->decimal('total', 8, 2);
             $table->timestamps();

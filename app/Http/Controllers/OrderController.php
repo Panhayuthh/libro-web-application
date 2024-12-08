@@ -11,7 +11,8 @@ class OrderController extends Controller
 {
     public function index()
     {
-        return view('order');
+        $orders = Order::where('user_id', Auth::id())->get();
+        return view('order', ['orders' => $orders]);
     }
 
     public function history()
