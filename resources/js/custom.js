@@ -30,3 +30,27 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
 });
+
+const incrementDecrementContainers = document.querySelectorAll(".increment-decrement-onclick");
+
+incrementDecrementContainers.forEach(container => {
+    const plus = container.querySelector(".plus");
+    const minus = container.querySelector(".minus");
+    const num = container.querySelector(".num");
+
+    let quantity = parseInt(num.innerText, 10);
+
+    plus.addEventListener("click", () => {
+        if (quantity < 10) {
+            quantity++;
+            num.innerText = (quantity < 10) ? + quantity : quantity;
+        }
+    });
+
+    minus.addEventListener("click", () => {
+        if (quantity > 1) {
+            quantity--;
+            num.innerText = (quantity < 10) ? + quantity : quantity;
+        }
+    });
+});

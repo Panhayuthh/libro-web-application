@@ -4,6 +4,10 @@
 
 @section('content')
 
+@error('item-existed')
+<div class="alert alert-danger mt-3">{{ $message }}</div>
+@enderror
+
 <h1 class="my-3">Coffee Menu</h1>
 
 {{-- @dd($cartItems) --}}
@@ -65,11 +69,11 @@
                             <h6 class="col-auto fw-bold m-0">Size:</h6>
                             <div class="col d-flex justify-content-center">
                                 <div class="btn-group" role="group" aria-label="Basic radio toggle button group">
-                                    <input type="radio" class="btn-check" name="size_{{ $item->id }}" id="size_small_{{ $item->id }}" value="small" checked>
+                                    <input type="radio" class="btn-check" name="size_id" id="size_small_{{ $item->id }}" value="1" checked>
                                     <label class="btn btn-outline-secondary rounded-pill" for="size_small_{{ $item->id }}">Small</label>
                                 </div>
                                 <div class="btn-group ms-3" role="group" aria-label="Basic radio toggle button group">
-                                    <input type="radio" class="btn-check" name="size_{{ $item->id }}" id="size_large_{{ $item->id }}" value="large">
+                                    <input type="radio" class="btn-check" name="size_id" id="size_large_{{ $item->id }}" value="2">
                                     <label class="btn btn-outline-secondary rounded-pill" for="size_large_{{ $item->id }}">Large</label>
                                 </div>
                             </div>
@@ -83,100 +87,215 @@
     </div>
     @endforeach
 </div>
+@endsection
 
 @auth
 @section('sidebar-main')
-    <div class="container-fluid d-flex flex-column vh-100 pb-5 px-4" style="overflow-y: auto; max-height: 100vh;">
+<div class="container-fluid d-flex flex-column vh-100 pb-5 px-4" style="overflow-y: auto; max-height: 100vh;">
+    @can('add-to-cart')
+    <form id="cart-form" action="{{ route('order.store') }}" method="post">
+        @csrf
         {{-- Header --}}
-        @can('add-to-cart')
         <div class="row mt-3 align-items-center">
             <h2 class="col">Cart</h2>
-            
             <div class="col text-end pe-3">
                 ID: {{ $cart->id }}
-            </div>      
+            </div>    
         </div>
-
+        
         {{-- Option --}}
         <div class="row g-3 mt-3">
             <div class="col btn-group" role="group" aria-label="Basic radio toggle button group">
-                <input type="radio" class="btn-check" name="option" id="option1" autocomplete="off" checked>
-                <label class="btn btn-outline-primary rounded-pill" for="option1">Delivery</label>
+                <input type="radio" class="btn-check" name="option" id="delivery" value="delivery" autocomplete="off" checked>
+                <label class="btn btn-outline-primary rounded-pill" for="delivery">Delivery</label>
             </div>
-     
+            
             <div class="col btn-group" role="group" aria-label="Basic radio toggle button group">
-                <input type="radio" class="btn-check" name="option" id="option2" autocomplete="off">
-                <label class="btn btn-outline-primary rounded-pill" for="option2">Pick Up</label>
+                <input type="radio" class="btn-check" name="option" id="pick-up" value="pick-up" autocomplete="off">
+                <label class="btn btn-outline-primary rounded-pill" for="pick-up">Pick Up</label>
             </div>
         </div>
-
+        
         {{-- Cart items --}}
         <div class="row mt-3">
             <div class="col-12">
                 <div class="card h-100">
-                    @foreach ($cartItems as $cartItem)
-                        <div class="card-body">
-                            <div class="d-flex justify-content-end">
-                                <form action="{{ route('destroyCartItem', $cartItem->id) }}" method="post" class="m-0">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="btn-close" aria-label="Remove Item"></button>
-                                </form>
-                            </div>
-                            <div class="d-flex justify-content-between">
-                                <h6><strong>{{ $cartItem->name }}</strong></h6>
-                                <span class="text-primary">${{ number_format($cartItem->price, 2) }}</span>
-                            </div> 
-                            <div class="d-flex justify-content-between">
-                                <span>{{ $cartItem->size_id == 1 ? 'Small' : 'Large' }}</span>
-                                <h6>Qty: {{ $cartItem->quantity }}</h6>
-                            </div>
-                        </div>
-                    @endforeach
-                    @if ($cartItems->isEmpty())
+                    @if(count($cartItems) == 0)
                         <div class="card-body">
                             <div class="d-flex justify-content-center">
                                 <h6>Cart is empty</h6>
                             </div>
                         </div>
                     @endif
+                    @foreach ($cartItems as $cartItem)
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <h6><strong>{{ $cartItem->name }}</strong></h6>
+                                <span class="text-primary">{{ number_format($cartItem->price, 2) }}</span>
+                                <button type="button" class="btn-close" aria-label="Remove Item" onclick="removeItem({{ $cartItem->id }})"></button>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center">
+
+                                <!-- Quantity -->
+                                <x-increment-decrement-onclick 
+                                id="{{ $cartItem->id }}" 
+                                price="{{ $cartItem->price }}" 
+                                quantity="{{ $cartItem->quantity }}" />
+                                
+                                <!-- Multiplied Amount -->
+                                <span class="text-primary" id="item-total-{{ $cartItem->id }}">
+                                    {{ number_format($cartItem->price * $cartItem->quantity, 2) }}
+                                </span>
+                                <span>{{ $cartItem->size_id == 1 ? 'Small' : 'Large' }}</span>
+                            </div>
+                        </div>
+                    @endforeach
                 </div>
             </div>
         </div>
-              
-
+        
         {{-- Total --}}
         <div class="col-12 mt-3">
-            <div class="card h-100">
+            <div class="card">
                 <div class="card-body">
                     <div class="d-flex justify-content-between">
                         <span>Subtotal</span>
-                        <span>{{ number_format($subtotal, 2) }}</span>
+                        <span id="subtotal">{{ number_format($subtotal, 2) }}</span>
                     </div>
                     <div class="d-flex justify-content-between">
                         <span>Tax (10%)</span>
-                        <span>{{ number_format($tax, 2) }}</span>
+                        <span id="tax">{{ number_format($tax, 2) }}</span>
                     </div>
                     <div class="d-flex justify-content-between">
                         <span>Delivery</span>
-                        <span>{{ number_format($delivery, 2) }}</span>
+                        <span id="delivery">{{ number_format($delivery, 2) }}</span>
                     </div>
                     <hr>
                     <div class="d-flex justify-content-between">
                         <span>Total</span>
-                        <span>{{ number_format($total, 2) }}</span>
+                        <span id="total">{{ number_format($total, 2) }}</span>
                     </div>
                 </div>
             </div>
         </div>
+        <input type="hidden" name="total" id="hidden-total" value="{{ number_format($total, 2) }}">
 
         {{-- Checkout --}}
-        <div class="flex-row mt-3 pb-4">
-            <x-button-pill class="btn-primary btn-lg">Checkout</x-button-pill>
-        </div>
-        @endcan
-    </div>
+        <x-button-pill class="btn-primary btn-lg mt-3" type="submit">Checkout</x-button-pill>
+    </form>
+    @endcan
+</div>
 @endsection
 @endauth
 
+@section('scripts')
+<script>
+    
+    function removeItem(id) {
+        const url = '{{ route('destroyCartItem', ':id') }}'.replace(':id', id);
+
+        try {
+            fetch(url, {
+                method: 'DELETE',
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Content-Type': 'text/plain',
+                },
+            })
+            .then(response => {
+                if (response.ok) {
+                    location.reload();
+                } else {
+                    return response.text().then(err => {
+                        console.error('Error response:', err);
+                        alert('An error occurred. Please try again.');
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Network or Fetch Error:', error);
+                alert('A network error occurred. Please try again.');
+            });
+        } catch (error) {
+            console.error('Unexpected Error:', error);
+            alert('An unexpected error occurred. Please try again.');
+        }
+    }
+
+    function adjustQuantity(itemId, change) {
+        const inputField = document.getElementById(`quantity-${itemId}`);
+
+        if (!inputField) {
+            console.error(`Input field for item ${itemId} not found.`);
+            return;
+        }
+
+        let currentQuantity = parseInt(inputField.value, 10);
+        if (isNaN(currentQuantity)) currentQuantity = 1;
+
+        const newQuantity = Math.max(currentQuantity + change, 1);
+
+        inputField.value = newQuantity;
+
+        updateAmount(itemId, parseFloat(inputField.getAttribute('data-item-price')));
+    }
+
+    function updateAmount(itemId, itemPrice) {
+        if (isNaN(itemPrice)) {
+            console.error(`Invalid item price for item ${itemId}`);
+            return;
+        }
+
+        const inputField = document.getElementById(`quantity-${itemId}`);
+        const quantity = parseInt(inputField.value, 10);
+
+        if (isNaN(quantity) || quantity < 1) {
+            console.error(`Invalid quantity for item ${itemId}`);
+            return;
+        }
+
+        const itemTotalElement = document.getElementById(`item-total-${itemId}`);
+        if (itemTotalElement) {
+            itemTotalElement.textContent = (itemPrice * quantity).toFixed(2);
+        }
+
+        const hiddenTotalInput = document.getElementById(`hidden-total-${itemId}`);
+        if (hiddenTotalInput) {
+            hiddenTotalInput.value = (itemPrice * quantity).toFixed(2);
+        }
+
+        updateCartTotals();
+    }
+
+    function updateCartTotals() {
+        let subtotal = 0;
+        const itemInputs = document.querySelectorAll('.num');
+
+        itemInputs.forEach(input => {
+            const quantity = parseInt(input.value, 10);
+            const price = parseFloat(input.getAttribute('data-item-price'));
+
+            if (!isNaN(quantity) && !isNaN(price)) {
+                subtotal += quantity * price;
+            }
+        });
+
+        const taxRate = 0.1; // 10% tax
+        const tax = subtotal * taxRate;
+        const deliveryFee = 5.0; // Flat delivery fee
+
+        const total = subtotal + tax + deliveryFee;
+
+        document.getElementById('subtotal').textContent = subtotal.toFixed(2);
+        document.getElementById('tax').textContent = tax.toFixed(2);
+        document.getElementById('delivery').textContent = deliveryFee.toFixed(2);
+        document.getElementById('total').textContent = total.toFixed(2);
+
+        const hiddenTotalInput = document.getElementById('hidden-total');
+        if (hiddenTotalInput) {
+            hiddenTotalInput.value = total.toFixed(2);
+        }
+    }
+
+</script>
 @endsection

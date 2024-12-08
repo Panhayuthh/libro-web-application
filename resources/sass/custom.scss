@@ -121,3 +121,41 @@ input[type="number"] {
     appearance: textfield;
     -moz-appearance: textfield;
 }
+
+.increment-decrement-onclick {
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #FFF;
+    border-radius: 6px;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.increment-decrement-onclick .btn {
+    width: 28px;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    background: #f9f9f9;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    user-select: none;
+}
+
+.increment-decrement-onclick .btn:hover {
+    background: #f1f1f1;
+}
+
+.increment-decrement-onclick .num {
+    width: 40px;
+    height: 100%;
+    border: none;
+    justify-content: center;
+    text-align: center;
+    outline: none;
+    font-size: 14px;
+}

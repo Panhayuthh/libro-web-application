@@ -15,4 +15,8 @@ class OrderController extends Controller
     {
         return view('history');
     }
+
+    public function store(Request $request) {
+        dd($request->all());
+    }
 }
