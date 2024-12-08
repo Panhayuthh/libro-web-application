@@ -74,13 +74,28 @@ class CartController extends Controller
             $cartItem->save();
         } catch (QueryException $e) {
             if ($e->getCode() == '23000') {
-                return back()->withErrors(['item-existed' => 'This item with the selected size is already in the cart.']);
+                return back()->with(['error' => 'This item with the selected size is already in the cart.']);
             }
             
             throw $e;
         }
     
         return redirect()->route('menu');
+    }
+
+    public function destroyCart($id)
+    {
+        try {
+            $cart = Cart::findOrFail($id);
+    
+            $cart->delete();
+    
+            return response('Cart removed successfully', 200);
+        } catch (ModelNotFoundException $e) {
+            return response($e->getMessage(), 404);
+        } catch (\Exception $e) {
+            return response($e->getMessage(), 500);
+        }
     }
     
 
@@ -93,9 +108,9 @@ class CartController extends Controller
     
             return response('Cart item removed successfully', 200);
         } catch (ModelNotFoundException $e) {
-            return response('Cart item not found', 404);
+            return response($e->getMessage(), 404);
         } catch (\Exception $e) {
-            return response('An error occurred while removing the item', 500);
+            return response($e->getMessage(), 500);
         }
     }    
 }

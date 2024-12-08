@@ -35,7 +35,10 @@ Route::group(['prefix' => 'menu'], function () {
     Route::patch('/cart/{cartItem}', [CartController::class, 'updateCartItem'])
             ->middleware('can:add-to-cart')
             ->name('updateCartItem');
-    Route::delete('/cart/{cartItem}', [CartController::class, 'destroyCartItem'])
+    Route::delete('/cart/{cart}', [CartController::class, 'destroyCart'])
+            ->middleware('can:add-to-cart')
+            ->name('destroyCart');
+    Route::delete('/cart/item/{cartItem}', [CartController::class, 'destroyCartItem'])
             ->middleware('can:add-to-cart')
             ->name('destroyCartItem');
 });

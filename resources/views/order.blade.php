@@ -4,6 +4,6 @@
 
 @section('content')
 
-    Hello from Order page
+    
 
 @endsection

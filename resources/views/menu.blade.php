@@ -4,9 +4,13 @@
 
 @section('content')
 
-@error('item-existed')
-<div class="alert alert-danger mt-3">{{ $message }}</div>
-@enderror
+@if(session('error'))
+<div class="alert alert-danger mt-3">{{ session('error') }}</div>
+@endif
+
+@if(session('success'))
+    <div class="alert alert-success mt-3">{{ session('success') }}</div>
+@endif
 
 <h1 class="my-3">Coffee Menu</h1>
 
@@ -102,22 +106,24 @@
                 ID: {{ $cart->id }}
             </div>    
         </div>
+        <input type="hidden" name="cart_id" value="{{ $cart->id }}">
+        
         
         {{-- Option --}}
         <div class="row g-3 mt-3">
             <div class="col btn-group" role="group" aria-label="Basic radio toggle button group">
-                <input type="radio" class="btn-check" name="option" id="delivery" value="delivery" autocomplete="off" checked>
+                <input type="radio" class="btn-check" name="option" id="delivery" value="1" autocomplete="off" checked>
                 <label class="btn btn-outline-primary rounded-pill" for="delivery">Delivery</label>
             </div>
             
             <div class="col btn-group" role="group" aria-label="Basic radio toggle button group">
-                <input type="radio" class="btn-check" name="option" id="pick-up" value="pick-up" autocomplete="off">
+                <input type="radio" class="btn-check" name="option" id="pick-up" value="2" autocomplete="off">
                 <label class="btn btn-outline-primary rounded-pill" for="pick-up">Pick Up</label>
             </div>
         </div>
         
         {{-- Cart items --}}
-        <div class="row mt-3">
+        <div class="row my-3">
             <div class="col-12">
                 <div class="card h-100">
                     @if(count($cartItems) == 0)
@@ -128,25 +134,26 @@
                         </div>
                     @endif
                     @foreach ($cartItems as $cartItem)
+                        <input type="hidden" name="menuItem_ids[]" value="{{ $cartItem->menu_item_id }}">
                         <div class="card-body">
                             <div class="d-flex justify-content-between">
                                 <h6><strong>{{ $cartItem->name }}</strong></h6>
-                                <span class="text-primary">{{ number_format($cartItem->price, 2) }}</span>
                                 <button type="button" class="btn-close" aria-label="Remove Item" onclick="removeItem({{ $cartItem->id }})"></button>
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <h6>{{ $cartItem->size_id == 1 ? 'Small' : 'Large' }}</h6>
+                                <input type="hidden" name="cart_item_sizes[]" value="{{ $cartItem->size_id }}">
+                                <span>{{ number_format($cartItem->price, 2) }}</span>
                             </div>
                             <div class="d-flex justify-content-between align-items-center">
 
                                 <!-- Quantity -->
-                                <x-increment-decrement-onclick 
-                                id="{{ $cartItem->id }}" 
-                                price="{{ $cartItem->price }}" 
-                                quantity="{{ $cartItem->quantity }}" />
+                                <x-increment-decrement-onclick id="{{ $cartItem->id }}" price="{{ $cartItem->price }}" quantity="{{ $cartItem->quantity }}" />
                                 
                                 <!-- Multiplied Amount -->
                                 <span class="text-primary" id="item-total-{{ $cartItem->id }}">
                                     {{ number_format($cartItem->price * $cartItem->quantity, 2) }}
                                 </span>
-                                <span>{{ $cartItem->size_id == 1 ? 'Small' : 'Large' }}</span>
                             </div>
                         </div>
                     @endforeach
@@ -181,7 +188,7 @@
         <input type="hidden" name="total" id="hidden-total" value="{{ number_format($total, 2) }}">
 
         {{-- Checkout --}}
-        <x-button-pill class="btn-primary btn-lg mt-3" type="submit">Checkout</x-button-pill>
+        <x-button-pill class="btn-primary btn-lg my-3" type="submit">Checkout</x-button-pill>
     </form>
     @endcan
 </div>

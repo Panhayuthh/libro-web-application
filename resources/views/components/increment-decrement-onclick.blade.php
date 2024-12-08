@@ -11,5 +11,4 @@
            readonly>
     <button type="button" class="plus btn btn-light" onclick="adjustQuantity({{ $id }}, 1)">+</button>
 </div>
-<input type="hidden" name="menuItem_ids[]" value="{{ $id }}">
 <input type="hidden" name="item_totals[]" id="hidden-total-{{ $id }}" value="{{ $price * $quantity }}">
