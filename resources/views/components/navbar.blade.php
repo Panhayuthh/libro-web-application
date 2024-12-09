@@ -1,7 +1,7 @@
 <nav class="navbar">
   <div class="container-fluid mx-0 px-5">
       <form class="d-none d-md-flex input-group w-50 my-auto" role="search">
-        <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+        <input type="text" id="search" class="form-control" placeholder="Search menu items..." oninput="filterMenuItems()">
         <button class="btn btn-outline-success" type="submit">Search</button>
       </form>
       @auth

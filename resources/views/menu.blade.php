@@ -59,10 +59,10 @@
         $category = $categories[$item->category_id] ?? 'Unknown';
     @endphp
     @auth
-    <div class="col-5 menu-item" data-category="{{ $item->category_id }}"> 
+    <div class="col-5 menu-item" data-category="{{ $item->category_id }}" data-name="{{ strtolower($item->name) }}"> 
     @endauth
     @guest
-    <div class="col-4 menu-item" data-category="{{ $item->category_id }}">
+    <div class="col-4 menu-item" data-category="{{ $item->category_id }}" data-name="{{ strtolower($item->name) }}">
     @endguest
         <div class="card h-100 shadow-sm">
             <form class="row p-3 m-0" action="{{ route('createCartItem') }}" method="post">
@@ -241,6 +241,27 @@
 
 @section('scripts')
 <script>
+    function filterMenuItems() {
+        const searchValue = document.getElementById('search').value.toLowerCase();
+        const selectedCategory = document.querySelector('input[name="category"]:checked').value;
+        const menuItems = document.querySelectorAll('.menu-item');
+
+        menuItems.forEach((item) => {
+            const category = item.getAttribute('data-category');
+            const name = item.getAttribute('data-name');
+            
+            if ((selectedCategory === 'all' || category === selectedCategory) &&
+                (name.includes(searchValue) || searchValue === '')) {
+                item.style.display = '';
+            } else {
+                item.style.display = 'none';
+            }
+        });
+    }
+
+    document.querySelectorAll('input[name="category"]').forEach((radio) => {
+        radio.addEventListener('change', filterMenuItems);
+    });
 
     document.querySelectorAll('input[name="category"]').forEach((radio) => {
         radio.addEventListener('change', function () {
@@ -249,9 +270,9 @@
             
             menuItems.forEach((item) => {
                 if (selectedCategory === 'all' || item.getAttribute('data-category') === selectedCategory) {
-                    item.style.display = ''; // Show the item
+                    item.style.display = '';
                 } else {
-                    item.style.display = 'none'; // Hide the item
+                    item.style.display = 'none';
                 }
             });
         });
