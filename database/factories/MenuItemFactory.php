@@ -20,7 +20,6 @@ class MenuItemFactory extends Factory
             'name' => fake()->word(),
             'description' => fake()->sentence(),
             'price' => fake()->randomFloat(2, 1, 100),
-            'status_id' => fake()->numberBetween(1, 2),
             'category_id' => fake()->numberBetween(1, 4)
         ];
     }

@@ -37,7 +37,10 @@
                                 <div class="row">
                                     <div class="col p-0">
                                         <div class="card p-3 border-0">
-                                            <img src="https://via.placeholder.com/25x25?text=Image" class="card-img object-fit-cover">
+                                            <img 
+                                            src="{{ $item->image ? asset('storage/' . $item->image) : 'https://via.placeholder.com/350x350?text=Image' }}" 
+                                            class="card-img h-100 w-100 object-fit-cover" 
+                                            alt="Menu Item Image">
                                         </div>
                                     </div>
                                     <div class="col mt-3">

@@ -10,5 +10,5 @@ class MenuItem extends Model
     /** @use HasFactory<\Database\Factories\MenuItemFactory> */
     use HasFactory;
 
-    protected $fillable = ['name', 'description', 'price', 'category_id'];
+    protected $fillable = ['name', 'description', 'price', 'category_id', 'image'];
 }
