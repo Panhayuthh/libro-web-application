@@ -19,6 +19,7 @@
 
         $status = $statuses[$order->status_id] ?? 'Encountered some problems';
         $progressPercentage = min((($order->status_id - 1) / 4) * 100, 100);
+
     @endphp
 
     <div class="card mt-5">
