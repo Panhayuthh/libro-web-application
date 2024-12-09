@@ -12,19 +12,57 @@
     <div class="alert alert-success mt-3">{{ session('success') }}</div>
 @endif
 
-<h1 class="my-3">Coffee Menu</h1>
 
 {{-- @dd($cartItems) --}}
 
 {{-- @dd($menuItems) --}}
 
+<div class="row g-3 mt-3">
+    <div class="col btn-group" role="group" aria-label="Category toggle button group">
+        <input type="radio" class="btn-check" name="category" id="all" value="all" autocomplete="off" checked>
+        <label class="btn btn-outline-primary rounded-pill" for="all">All</label>
+    </div>
+    
+    <div class="col btn-group" role="group" aria-label="Category toggle button group">
+        <input type="radio" class="btn-check" name="category" id="coffee" value="1" autocomplete="off">
+        <label class="btn btn-outline-primary rounded-pill" for="coffee">Coffee</label>
+    </div>
+
+    <div class="col btn-group" role="group" aria-label="Category toggle button group">
+        <input type="radio" class="btn-check" name="category" id="non-coffee" value="2" autocomplete="off">
+        <label class="btn btn-outline-primary rounded-pill" for="non-coffee">Non-Coffee</label>
+    </div>
+    
+    <div class="col btn-group" role="group" aria-label="Category toggle button group">
+        <input type="radio" class="btn-check" name="category" id="tea" value="3" autocomplete="off">
+        <label class="btn btn-outline-primary rounded-pill" for="tea">Tea</label>
+    </div>
+
+    <div class="col btn-group" role="group" aria-label="Category toggle button group">
+        <input type="radio" class="btn-check" name="category" id="snacks" value="4" autocomplete="off">
+        <label class="btn btn-outline-primary rounded-pill" for="snacks">Snacks</label>
+    </div>
+</div>
+
+<h1 class="my-3">Menu</h1>
+
 <div class="row justify-content-center g-3">
     @foreach ($menuItems as $item)
+    @php
+        $categories = [
+            1 => 'Coffee',
+            2 => 'Non-Coffee',
+            3 => 'Tea',
+            4 => 'Snacks',
+        ];
+
+        $category = $categories[$item->category_id] ?? 'Unknown';
+    @endphp
     @auth
-    <div class="col-5"> 
+    <div class="col-5 menu-item" data-category="{{ $item->category_id }}"> 
     @endauth
     @guest
-    <div class="col-4">
+    <div class="col-4 menu-item" data-category="{{ $item->category_id }}">
     @endguest
         <div class="card h-100 shadow-sm">
             <form class="row p-3 m-0" action="{{ route('createCartItem') }}" method="post">
@@ -55,6 +93,7 @@
                                     {{ $item->name }}
                                     <span class="text-primary fw-bold">{{ $item->price }}</span>
                                 </h5>
+                                <p class="card-text m-0">{{ $category }}</p>
                                 <p class="card-text text-muted" style="
                                     display: -webkit-box;
                                     -webkit-line-clamp: 3;
@@ -203,26 +242,38 @@
 @section('scripts')
 <script>
 
+    document.querySelectorAll('input[name="category"]').forEach((radio) => {
+        radio.addEventListener('change', function () {
+            const selectedCategory = this.value;
+            const menuItems = document.querySelectorAll('.menu-item');
+            
+            menuItems.forEach((item) => {
+                if (selectedCategory === 'all' || item.getAttribute('data-category') === selectedCategory) {
+                    item.style.display = ''; // Show the item
+                } else {
+                    item.style.display = 'none'; // Hide the item
+                }
+            });
+        });
+    });
+
     document.addEventListener('DOMContentLoaded', function () {
-        // Get radio buttons and address container
+
         const deliveryRadio = document.getElementById('delivery');
         const pickupRadio = document.getElementById('pick-up');
         const addressContainer = document.getElementById('address-container');
 
-        // Function to toggle visibility of the address input
         function toggleAddressInput() {
             if (deliveryRadio.checked) {
-                addressContainer.style.display = 'block'; // Show address input
+                addressContainer.style.display = 'block';
             } else {
-                addressContainer.style.display = 'none'; // Hide address input
+                addressContainer.style.display = 'none';
             }
         }
 
-        // Add event listeners to the radio buttons
         deliveryRadio.addEventListener('change', toggleAddressInput);
         pickupRadio.addEventListener('change', toggleAddressInput);
 
-        // Initial check to set the correct state on page load
         toggleAddressInput();
     });
 
