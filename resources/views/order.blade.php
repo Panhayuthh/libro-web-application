@@ -2,6 +2,7 @@
 
 @section('title', 'Order')
 
+@auth
 @section('content')
 
     {{-- @dd($orders); --}}
@@ -17,7 +18,7 @@
         ];
 
         $status = $statuses[$order->status_id] ?? 'Encountered some problems';
-        $progressPercentage = min(($order->status_id / 5) * 100, 100);
+        $progressPercentage = min((($order->status_id - 1) / 4) * 100, 100);
     @endphp
 
     <div class="card mt-5">
@@ -36,7 +37,7 @@
                     <p class="card-text">{{ $order->id }}</p>
     
                     <h5 class="cart-title">Delivery Address: </h5>
-                    <p class="card-text">123, Jalan ABC, 12345, Kuala Lumpur</p>
+                    <p class="card-text">{{ $order->address }}</p>
                 </div>
             </div>
         </div>
@@ -122,3 +123,4 @@
         </div>
     </div>
 @endsection
+@endauth

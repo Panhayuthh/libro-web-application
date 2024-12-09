@@ -16,6 +16,7 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained()->onDelete('cascade')->onUpdate('cascade');
             $table->integer('delivery_id')
             ->comment('1: Delivery, 2: Pickup');
+            $table->string('address')->nullable();
             $table->integer('status_id')
             ->comment('1: Received, 2: Confirmed, 3: Preparing, 4: Delivering, 5: Delivered, 6: Ready for Pickup, 7: Refunded, 8: Canceled')
             ->default(1);

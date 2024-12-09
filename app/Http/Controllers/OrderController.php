@@ -20,15 +20,31 @@ class OrderController extends Controller
 
     public function history()
     {
-        return view('history');
+        $orders = Order::with(['orderItems.menuItem'])
+            ->where('user_id', Auth::id())
+            ->orderBy('created_at', 'desc')
+            ->get();
+    
+        return view('history', [
+            'orders' => $orders,
+        ]);
     }
-
+    
     public function store(Request $request) {
         // dd($request->all());
+
+        if($request->menuItem_ids == null) {
+            return redirect()->back()->with('error', 'Cart is empty');
+        }
+
+        if ($request->option == 1 && empty($request->address)) {
+            return redirect()->back()->with('error', 'Address is required for delivery');
+        }
 
         $order = new Order();
         $order->user_id = Auth::id();
         $order->delivery_id = $request->option;
+        $order->address = $request->address;
         $order->total = $request->total;
         $order->save();
 

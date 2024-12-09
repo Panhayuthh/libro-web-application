@@ -32,7 +32,6 @@
                 @auth
                 <input type="hidden" name="menu_item_id" value="{{ $item->id }}">
                 <input type="hidden" name="cart_id" value="{{ $cart->id }}">
-                <input type="hidden" name="quantity" value="1">
                 @endauth
                 {{-- left column --}}
                 <div class="col-4 ps-0">
@@ -100,10 +99,10 @@
     <form id="cart-form" action="{{ route('order.store') }}" method="post">
         @csrf
         {{-- Header --}}
-        <div class="row mt-3 align-items-center">
-            <h2 class="col">Cart</h2>
+        <div class="row mt-5 align-items-center">
+            <h3 class="col"><strong>Order No.</strong></h3>
             <div class="col text-end pe-3">
-                ID: {{ $cart->id }}
+                <h5>{{ $cart->id }}</h5>
             </div>    
         </div>
         <input type="hidden" name="cart_id" value="{{ $cart->id }}">
@@ -119,6 +118,12 @@
             <div class="col btn-group" role="group" aria-label="Basic radio toggle button group">
                 <input type="radio" class="btn-check" name="option" id="pick-up" value="2" autocomplete="off">
                 <label class="btn btn-outline-primary rounded-pill" for="pick-up">Pick Up</label>
+            </div>
+        </div>
+        
+        <div class="row g-3 mt-1">
+            <div class="col" id="address-container">
+                <x-form-input type="text" name="address" label="Address" placeholder="Enter your address" />
             </div>
         </div>
         
@@ -197,7 +202,30 @@
 
 @section('scripts')
 <script>
-    
+
+    document.addEventListener('DOMContentLoaded', function () {
+        // Get radio buttons and address container
+        const deliveryRadio = document.getElementById('delivery');
+        const pickupRadio = document.getElementById('pick-up');
+        const addressContainer = document.getElementById('address-container');
+
+        // Function to toggle visibility of the address input
+        function toggleAddressInput() {
+            if (deliveryRadio.checked) {
+                addressContainer.style.display = 'block'; // Show address input
+            } else {
+                addressContainer.style.display = 'none'; // Hide address input
+            }
+        }
+
+        // Add event listeners to the radio buttons
+        deliveryRadio.addEventListener('change', toggleAddressInput);
+        pickupRadio.addEventListener('change', toggleAddressInput);
+
+        // Initial check to set the correct state on page load
+        toggleAddressInput();
+    });
+
     function removeItem(id) {
         const url = '{{ route('destroyCartItem', ':id') }}'.replace(':id', id);
 
