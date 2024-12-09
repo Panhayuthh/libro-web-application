@@ -12,19 +12,57 @@
     <div class="alert alert-success mt-3">{{ session('success') }}</div>
 @endif
 
-<h1 class="my-3">Coffee Menu</h1>
 
 {{-- @dd($cartItems) --}}
 
 {{-- @dd($menuItems) --}}
 
+<div class="row g-3 mt-3">
+    <div class="col btn-group" role="group" aria-label="Category toggle button group">
+        <input type="radio" class="btn-check" name="category" id="all" value="all" autocomplete="off" checked>
+        <label class="btn btn-outline-primary rounded-pill" for="all">All</label>
+    </div>
+    
+    <div class="col btn-group" role="group" aria-label="Category toggle button group">
+        <input type="radio" class="btn-check" name="category" id="coffee" value="1" autocomplete="off">
+        <label class="btn btn-outline-primary rounded-pill" for="coffee">Coffee</label>
+    </div>
+
+    <div class="col btn-group" role="group" aria-label="Category toggle button group">
+        <input type="radio" class="btn-check" name="category" id="non-coffee" value="2" autocomplete="off">
+        <label class="btn btn-outline-primary rounded-pill" for="non-coffee">Non-Coffee</label>
+    </div>
+    
+    <div class="col btn-group" role="group" aria-label="Category toggle button group">
+        <input type="radio" class="btn-check" name="category" id="tea" value="3" autocomplete="off">
+        <label class="btn btn-outline-primary rounded-pill" for="tea">Tea</label>
+    </div>
+
+    <div class="col btn-group" role="group" aria-label="Category toggle button group">
+        <input type="radio" class="btn-check" name="category" id="snacks" value="4" autocomplete="off">
+        <label class="btn btn-outline-primary rounded-pill" for="snacks">Snacks</label>
+    </div>
+</div>
+
+<h1 class="my-3">Menu</h1>
+
 <div class="row justify-content-center g-3">
     @foreach ($menuItems as $item)
+    @php
+        $categories = [
+            1 => 'Coffee',
+            2 => 'Non-Coffee',
+            3 => 'Tea',
+            4 => 'Snacks',
+        ];
+
+        $category = $categories[$item->category_id] ?? 'Unknown';
+    @endphp
     @auth
-    <div class="col-5"> 
+    <div class="col-5 menu-item" data-category="{{ $item->category_id }}" data-name="{{ strtolower($item->name) }}"> 
     @endauth
     @guest
-    <div class="col-4">
+    <div class="col-4 menu-item" data-category="{{ $item->category_id }}" data-name="{{ strtolower($item->name) }}">
     @endguest
         <div class="card h-100 shadow-sm">
             <form class="row p-3 m-0" action="{{ route('createCartItem') }}" method="post">
@@ -32,7 +70,6 @@
                 @auth
                 <input type="hidden" name="menu_item_id" value="{{ $item->id }}">
                 <input type="hidden" name="cart_id" value="{{ $cart->id }}">
-                <input type="hidden" name="quantity" value="1">
                 @endauth
                 {{-- left column --}}
                 <div class="col-4 ps-0">
@@ -56,6 +93,7 @@
                                     {{ $item->name }}
                                     <span class="text-primary fw-bold">{{ $item->price }}</span>
                                 </h5>
+                                <p class="card-text m-0">{{ $category }}</p>
                                 <p class="card-text text-muted" style="
                                     display: -webkit-box;
                                     -webkit-line-clamp: 3;
@@ -100,10 +138,10 @@
     <form id="cart-form" action="{{ route('order.store') }}" method="post">
         @csrf
         {{-- Header --}}
-        <div class="row mt-3 align-items-center">
-            <h2 class="col">Cart</h2>
+        <div class="row mt-5 align-items-center">
+            <h3 class="col"><strong>Order No.</strong></h3>
             <div class="col text-end pe-3">
-                ID: {{ $cart->id }}
+                <h5>{{ $cart->id }}</h5>
             </div>    
         </div>
         <input type="hidden" name="cart_id" value="{{ $cart->id }}">
@@ -119,6 +157,12 @@
             <div class="col btn-group" role="group" aria-label="Basic radio toggle button group">
                 <input type="radio" class="btn-check" name="option" id="pick-up" value="2" autocomplete="off">
                 <label class="btn btn-outline-primary rounded-pill" for="pick-up">Pick Up</label>
+            </div>
+        </div>
+        
+        <div class="row g-3 mt-1">
+            <div class="col" id="address-container">
+                <x-form-input type="text" name="address" label="Address" placeholder="Enter your address" />
             </div>
         </div>
         
@@ -197,7 +241,63 @@
 
 @section('scripts')
 <script>
-    
+    function filterMenuItems() {
+        const searchValue = document.getElementById('search').value.toLowerCase();
+        const selectedCategory = document.querySelector('input[name="category"]:checked').value;
+        const menuItems = document.querySelectorAll('.menu-item');
+
+        menuItems.forEach((item) => {
+            const category = item.getAttribute('data-category');
+            const name = item.getAttribute('data-name');
+            
+            if ((selectedCategory === 'all' || category === selectedCategory) &&
+                (name.includes(searchValue) || searchValue === '')) {
+                item.style.display = '';
+            } else {
+                item.style.display = 'none';
+            }
+        });
+    }
+
+    document.querySelectorAll('input[name="category"]').forEach((radio) => {
+        radio.addEventListener('change', filterMenuItems);
+    });
+
+    document.querySelectorAll('input[name="category"]').forEach((radio) => {
+        radio.addEventListener('change', function () {
+            const selectedCategory = this.value;
+            const menuItems = document.querySelectorAll('.menu-item');
+            
+            menuItems.forEach((item) => {
+                if (selectedCategory === 'all' || item.getAttribute('data-category') === selectedCategory) {
+                    item.style.display = '';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        });
+    });
+
+    document.addEventListener('DOMContentLoaded', function () {
+
+        const deliveryRadio = document.getElementById('delivery');
+        const pickupRadio = document.getElementById('pick-up');
+        const addressContainer = document.getElementById('address-container');
+
+        function toggleAddressInput() {
+            if (deliveryRadio.checked) {
+                addressContainer.style.display = 'block';
+            } else {
+                addressContainer.style.display = 'none';
+            }
+        }
+
+        deliveryRadio.addEventListener('change', toggleAddressInput);
+        pickupRadio.addEventListener('change', toggleAddressInput);
+
+        toggleAddressInput();
+    });
+
     function removeItem(id) {
         const url = '{{ route('destroyCartItem', ':id') }}'.replace(':id', id);
 
