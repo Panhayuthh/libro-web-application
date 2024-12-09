@@ -22,11 +22,11 @@ class AuthServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Gate::define('admin', function ($user) {
-            return $user->role === 'admin';
+            return $user->is_admin;
         });
 
         Gate::define('add-to-cart', function ($user) {
-            return Auth::check();
+            return Auth::check() && !$user->is_admin;
         });
     }
 }
