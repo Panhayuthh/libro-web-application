@@ -2,11 +2,37 @@
 
 @section('title', 'Order')
 
+
+@guest
+    @section('content')
+        <div class="card mt-5">
+            <div class="card-body">
+                <h5 class="card-title">Please Login</h5>
+                <p class="card-text">You need to login to view your order.</p>
+            </div>
+        </div>
+    @endsection
+
+    @section('sidebar-main')
+        <div class="container-fluid d-flex flex-column vh-100 pb-5 px-4" style="overflow-y: auto; max-height: 100vh;">
+            <h3 class="mt-5"><strong>Order Summary</strong></h3>
+        </div>
+    @endsection
+@endguest
+
 @auth
 @section('content')
 
     {{-- @dd($orders); --}}
 
+@if ($orders->isEmpty())
+<div class="card mt-5">
+    <div class="card-body">
+        <h5 class="card-title">Order Not Found</h5>
+        <p class="card-text">No orders found for today.</p>
+    </div>
+</div>
+@else
     @foreach ($orders as $order)
     @php
         $statuses = [
@@ -25,12 +51,35 @@
     <div class="card mt-5">
         <div class="row">
             <div class="col-6">
+                @cannot('admin')
                 <div class="card-body border-end m-3">
                     <h6>Your Order is</h6>
                     <h1><strong> {{ $status }} </strong></h1>
                     <h6>Order at: {{ \Carbon\Carbon::parse($order->updated_at)->format('H:i d, m, Y') }}</h6>
                     <p class="card-text"><small class="text-body-secondary">Last updated {{ \Carbon\Carbon::parse($order->updated_at)->diffForHumans() }}</small></p>
                 </div>
+                @endcannot
+                @can('admin')
+                <div class="card-body border-end m3">
+                    @foreach($order->orderItems as $item)
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="card p-3 border-0">
+                                <img 
+                                src="{{ $item->image ? asset('storage/' . $item->image) : 'https://via.placeholder.com/350x350?text=Image' }}" 
+                                class="card-img h-100 w-100 object-fit-cover" 
+                                alt="Menu Item Image">
+                            </div>
+                        </div>
+                        <div class="col mt-3">
+                            <h6 class="card-text">{{ $item->menuItem->name }}</h6>
+                            <p class="card-text">{{ $item->menuItem->price }}</p>
+                            <p class="card-text">Quantity: {{ $item->quantity }}</p>
+                        </div>
+                    </div>
+                    @endforeach
+                </div>
+                @endcan
             </div>
             <div class="col-6">
                 <div class="card-body m-3">                       
@@ -39,9 +88,27 @@
     
                     <h5 class="cart-title">Delivery Address: </h5>
                     <p class="card-text">{{ $order->address }}</p>
+
+                    @can('admin')
+                        <form action="{{ route('order.status', $order) }}" method="post">
+                            @csrf
+                            @method('PUT')
+                    
+                            <div class="mb-3">
+                                <label for="status" class="form-label">Status</label>
+                                <select class="form-select" id="status" name="status_id">
+                                    @foreach ($statuses as $id => $text)
+                                        <option value="{{ $id }}" {{ $order->status_id == $id ? 'selected' : '' }}>{{ $text }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <button type="submit" class="btn btn-primary rounded-pill">Update Status</button>
+                        </form>
+                    @endcan                
                 </div>
             </div>
         </div>
+        @cannot('admin')
         <div class="card-body">
             <h5 class="card-title mx-3"> Tracking History </h5>
 
@@ -105,13 +172,16 @@
                 </div>
             </div>
         </div>
+        @endcannot
     </div>
-@endforeach
+    @endforeach
+@endif
 
 @endsection
 
 @section('sidebar-main')
     <div class="container-fluid d-flex flex-column vh-100 pb-5 px-4" style="overflow-y: auto; max-height: 100vh;">
+        @cannot('admin')
         <h3 class="mt-5"><strong>Order Summary</strong></h3>
         <div class="card mt-3">
             <div class="card-body">
@@ -122,6 +192,46 @@
                 <p class="card-text">012892633</p>
             </div>
         </div>
+        @endcannot
+        @can('admin')
+            <h3 class="mt-5"><strong>Today Order</strong></h3>
+        
+            @if ($orders->isEmpty())
+                <div class="card mt-3">
+                    <div class="card-body">
+                        <h5 class="card-title">Order Not Found</h5>
+                        <p class="card-text">No orders found for today.</p>
+                    </div>
+                </div>
+            @else
+                @php
+                    $total = 0;
+                    $totalOrder = $orders->count(); // Count total orders
+        
+                    foreach ($orders as $order) {
+                        foreach ($order->orderItems as $item) {
+                            $total += $item->menuItem->price * $item->quantity;
+                        }
+                    }
+                @endphp
+        
+                <!-- Total Amount Card -->
+                <div class="card mt-3">
+                    <div class="card-body">
+                        <h5 class="card-title">Total Amount: </h5>
+                        <p class="card-text">{{ $total }}</p>
+                    </div>
+                </div>
+        
+                <!-- Total Orders Card -->
+                <div class="card mt-3">
+                    <div class="card-body">
+                        <h5 class="card-title">Total Orders: </h5>
+                        <p class="card-text">{{ $totalOrder }}</p>
+                    </div>
+                </div>
+            @endif
+        @endcan    
     </div>
 @endsection
 @endauth

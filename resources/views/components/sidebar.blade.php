@@ -13,6 +13,7 @@
         <i class="nav-icon cil-list"></i> Menu
       </a>
     </li>
+    @cannot('admin')
     <li class="nav-item">
       <a class="nav-link {{ request()->is('order') ? 'active' : '' }}" href="{{ route('order') }}">
         <i class="nav-icon cil-cart"></i> Order
@@ -23,6 +24,19 @@
         <i class="nav-icon cil-history"></i> History
       </a>
     </li>
+    @endcannot
+    @can('admin')
+    <li class="nav-item">
+      <a class="nav-link {{ request()->is('admin/order') ? 'active' : '' }}" href="{{ route('admin.order') }}">
+        <i class="nav-icon cil-cart"></i> Order
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link {{ request()->is('admin/history') ? 'active' : '' }}" href="{{ route('admin.history') }}">
+        <i class="nav-icon cil-history"></i> History
+      </a>
+    </li>
+    @endcan
   </ul>
   <div class="sidebar-footer border-top d-flex">
     <button class="sidebar-toggler" type="button"></button>

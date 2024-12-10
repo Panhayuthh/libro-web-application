@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\MenuItem;
+use App\Models\Order;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -102,5 +104,42 @@ class adminController extends Controller
         } catch (\Exception $e) {
             return response($e->getMessage(), 500);
         }
+    }
+
+    public function order()
+    {
+        $order = Order::with(['orderItems.menuItem'])
+            // ->whereDate('created_at', Carbon::today())
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return view('order', [
+            'orders' => $order,
+        ]);
+    }
+
+    public function history()
+    {
+        $order = Order::with(['orderItems.menuItem'])
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return view('history', [
+            'orders' => $order,
+        ]);
+    }
+
+    public function updateOrderStatus(Request $request, Order $order)
+    {
+        // dd($request->all());
+
+        // $request->validate([
+        //     'status_id' => 'required|integer|exists:statuses,id',
+        // ]);
+
+        $order->status_id = $request->status_id;
+        $order->save();
+
+        return redirect()->route('admin.order')->with('success', 'Order status updated successfully');
     }
 }
