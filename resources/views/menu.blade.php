@@ -66,50 +66,7 @@
     </div>
 
     <!-- Add Item Modal -->
-    <div class="modal fade" id="addItemModal" tabindex="-1" aria-labelledby="addItemModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <!-- Modal Header -->
-                <div class="modal-header">
-                    <h5 class="modal-title" id="addItemModalLabel">Add New Item</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-
-                <!-- Modal Body -->
-                <div class="modal-body">
-                    <form id="addItemForm" action="{{ route('menu.store') }}" method="POST" enctype="multipart/form-data">
-                        @csrf
-                        <x-form-input type="text" name="name" label="Item Name" placeholder="Enter item name" />
-                        <div class="mb-3">
-                            <label for="itemCategory" class="form-label">Category</label>
-                            <select class="form-select" id="itemCategory" name="category_id">
-                                <option value="">Select a category</option>
-                                <option value="1">Coffee</option>
-                                <option value="2">Non-Coffee</option>
-                                <option value="3">Tea</option>
-                                <option value="4">Snacks</option>
-                            </select>
-                        </div>
-                        <x-form-input type="number" name="price" label="Price" placeholder="Enter item price" />
-                        <div class="mb-3">
-                            <label for="itemDescription" class="form-label">Description</label>
-                            <textarea class="form-control" id="itemDescription" name="description" rows="3"></textarea>
-                        </div>
-                        <div class="mb-3">
-                            <label for="itemImage" class="form-label">Item Image</label>
-                            <input type="file" class="form-control" id="itemImage" name="image" accept="image/*">
-                        </div>
-                    </form>
-                </div>
-
-                <!-- Modal Footer -->
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="submit" form="addItemForm" class="btn btn-primary">Save Item</button>
-                </div>
-            </div>
-        </div>
-    </div>
+    @include('components.create-menu-modal')
 @endcan
 
 <div class="row justify-content-center g-3">
@@ -206,8 +163,9 @@
                             @can('admin')
                             <div class="d-flex justify-content-end mt-auto">
                                 <div class="dropdown">
-                                    <button class="btn btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <button class="btn btn-primary" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                                         Actions
+                                        <i class="bi bi-three-dots-vertical"></i>
                                     </button>
                                     <ul class="dropdown-menu dropdown-menu-end">
                                         <li>
@@ -234,48 +192,7 @@
                                 </div>
                             </div>
 
-                            <div class="modal fade" id="editItemModal" tabindex="-1" aria-labelledby="editItemModalLabel" aria-hidden="true">
-                                <div class="modal-dialog">
-                                    <div class="modal-content">
-                                        <form id="editItemForm" method="POST">
-                                            @csrf
-                                            @method('PUT')
-                                            <div class="modal-header">
-                                                <h5 class="modal-title" id="editItemModalLabel">Edit Item</h5>
-                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                            </div>
-                                            <div class="modal-body">
-                                                <div class="mb-3">
-                                                    <label for="editName" class="form-label">Name</label>
-                                                    <input type="text" class="form-control" id="editName" name="name">
-                                                </div>
-                                                <div class="mb-3">
-                                                    <label for="editPrice" class="form-label">Price</label>
-                                                    <input type="number" class="form-control" id="editPrice" name="price">
-                                                </div>
-                                                <div class="mb-3">
-                                                    <label for="editCategory" class="form-label">Category</label>
-                                                    <select class="form-select" id="editCategory" name="category_id">
-                                                        <option value="1">Coffee</option>
-                                                        <option value="2">Non-Coffee</option>
-                                                        <option value="3">Tea</option>
-                                                        <option value="4">Snacks</option>
-                                                    </select>
-                                                </div>
-                                                <div class="mb-3">
-                                                    <label for="editDescription" class="form-label">Description</label>
-                                                    <textarea class="form-control" id="editDescription" name="description" rows="3"></textarea>
-                                                </div>
-                                            </div>
-                                            <div class="modal-footer">
-                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                                                <button type="submit" class="btn btn-primary">Save Changes</button>
-                                            </div>
-                                        </form>
-                                    </div>
-                                </div>
-                            </div>
-                            
+                            @include('components.edit-menu-modal')
                             @endcan
                         </div>
                     </div>
@@ -404,19 +321,117 @@
 @section('scripts')
 <script>
 
-function populateEditModal(menuItem) {
-    const editForm = document.getElementById('editItemForm');
-    editForm.action = `{{ route('menu.update', ':id') }}`.replace(':id', menuItem.id);
+    function populateEditModal(menuItem) {
+        const editForm = document.getElementById('editItemForm');
+        editForm.action = `{{ route('menu.update', ':id') }}`.replace(':id', menuItem.id);
 
-    document.getElementById('editName').value = menuItem.name;
-    document.getElementById('editPrice').value = menuItem.price;
-    document.getElementById('editCategory').value = menuItem.category_id;
-    document.getElementById('editDescription').value = menuItem.description;
-}
+        document.getElementById('editName').value = menuItem.name;
+        document.getElementById('editPrice').value = menuItem.price;
+        document.getElementById('editCategory').value = menuItem.category_id;
+        document.getElementById('editDescription').value = menuItem.description;
 
-function deleteItem(itemId) {
-    if (confirm('Are you sure you want to delete this item?')) {
-        const url = '{{ route('menu.destroy', ':id') }}'.replace(':id', itemId);
+        const imagePreview = document.getElementById('editImagePreview');
+        if (menuItem.image) {
+            imagePreview.src = `/storage/${menuItem.image}`;
+            imagePreview.style.display = 'block';
+        } else {
+            imagePreview.style.display = 'none';
+        }
+    }
+
+    function deleteItem(itemId) {
+        if (confirm('Are you sure you want to delete this item?')) {
+            const url = '{{ route('menu.destroy', ':id') }}'.replace(':id', itemId);
+
+            try {
+                fetch(url, {
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'Content-Type': 'text/plain',
+                    },
+                })
+                .then(response => {
+                    if (response.ok) {
+                        alert('Item deleted successfully.');
+                        location.reload();
+                    } else {
+                        return response.text().then(err => {
+                            console.error('Error response:', err);
+                            alert('An error occurred. Please try again.');
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error('Network or Fetch Error:', error);
+                    alert('A network error occurred. Please try again.');
+                });
+            } catch (error) {
+                console.error('Unexpected Error:', error);
+                alert('An unexpected error occurred. Please try again.');
+            }
+        }
+    }
+
+    function filterMenuItems() {
+        const searchValue = document.getElementById('search').value.toLowerCase();
+        const selectedCategory = document.querySelector('input[name="category"]:checked').value;
+        const menuItems = document.querySelectorAll('.menu-item');
+
+        menuItems.forEach((item) => {
+            const category = item.getAttribute('data-category');
+            const name = item.getAttribute('data-name');
+            
+            if ((selectedCategory === 'all' || category === selectedCategory) &&
+                (name.includes(searchValue) || searchValue === '')) {
+                item.style.display = '';
+            } else {
+                item.style.display = 'none';
+            }
+        });
+    }
+
+    document.querySelectorAll('input[name="category"]').forEach((radio) => {
+        radio.addEventListener('change', filterMenuItems);
+    });
+
+    document.querySelectorAll('input[name="category"]').forEach((radio) => {
+        radio.addEventListener('change', function () {
+            const selectedCategory = this.value;
+            const menuItems = document.querySelectorAll('.menu-item');
+            
+            menuItems.forEach((item) => {
+                if (selectedCategory === 'all' || item.getAttribute('data-category') === selectedCategory) {
+                    item.style.display = '';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        });
+    });
+
+    document.addEventListener('DOMContentLoaded', function () {
+
+        const deliveryRadio = document.getElementById('delivery');
+        const pickupRadio = document.getElementById('pick-up');
+        const addressContainer = document.getElementById('address-container');
+
+        function toggleAddressInput() {
+            if (deliveryRadio.checked) {
+                addressContainer.style.display = 'block';
+            } else {
+                addressContainer.style.display = 'none';
+            }
+        }
+
+        deliveryRadio.addEventListener('change', toggleAddressInput);
+        pickupRadio.addEventListener('change', toggleAddressInput);
+
+        toggleAddressInput();
+    });
+
+    function removeItem(id) {
+        const url = '{{ route('destroyCartItem', ':id') }}'.replace(':id', id);
 
         try {
             fetch(url, {
@@ -428,7 +443,6 @@ function deleteItem(itemId) {
             })
             .then(response => {
                 if (response.ok) {
-                    alert('Item deleted successfully.');
                     location.reload();
                 } else {
                     return response.text().then(err => {
@@ -446,170 +460,81 @@ function deleteItem(itemId) {
             alert('An unexpected error occurred. Please try again.');
         }
     }
-}
 
-function filterMenuItems() {
-    const searchValue = document.getElementById('search').value.toLowerCase();
-    const selectedCategory = document.querySelector('input[name="category"]:checked').value;
-    const menuItems = document.querySelectorAll('.menu-item');
+    function adjustQuantity(itemId, change) {
+        const inputField = document.getElementById(`quantity-${itemId}`);
 
-    menuItems.forEach((item) => {
-        const category = item.getAttribute('data-category');
-        const name = item.getAttribute('data-name');
-        
-        if ((selectedCategory === 'all' || category === selectedCategory) &&
-            (name.includes(searchValue) || searchValue === '')) {
-            item.style.display = '';
-        } else {
-            item.style.display = 'none';
+        if (!inputField) {
+            console.error(`Input field for item ${itemId} not found.`);
+            return;
         }
-    });
-}
 
-document.querySelectorAll('input[name="category"]').forEach((radio) => {
-    radio.addEventListener('change', filterMenuItems);
-});
+        let currentQuantity = parseInt(inputField.value, 10);
+        if (isNaN(currentQuantity)) currentQuantity = 1;
 
-document.querySelectorAll('input[name="category"]').forEach((radio) => {
-    radio.addEventListener('change', function () {
-        const selectedCategory = this.value;
-        const menuItems = document.querySelectorAll('.menu-item');
-        
-        menuItems.forEach((item) => {
-            if (selectedCategory === 'all' || item.getAttribute('data-category') === selectedCategory) {
-                item.style.display = '';
-            } else {
-                item.style.display = 'none';
+        const newQuantity = Math.max(currentQuantity + change, 1);
+
+        inputField.value = newQuantity;
+
+        updateAmount(itemId, parseFloat(inputField.getAttribute('data-item-price')));
+    }
+
+    function updateAmount(itemId, itemPrice) {
+        if (isNaN(itemPrice)) {
+            console.error(`Invalid item price for item ${itemId}`);
+            return;
+        }
+
+        const inputField = document.getElementById(`quantity-${itemId}`);
+        const quantity = parseInt(inputField.value, 10);
+
+        if (isNaN(quantity) || quantity < 1) {
+            console.error(`Invalid quantity for item ${itemId}`);
+            return;
+        }
+
+        const itemTotalElement = document.getElementById(`item-total-${itemId}`);
+        if (itemTotalElement) {
+            itemTotalElement.textContent = (itemPrice * quantity).toFixed(2);
+        }
+
+        const hiddenTotalInput = document.getElementById(`hidden-total-${itemId}`);
+        if (hiddenTotalInput) {
+            hiddenTotalInput.value = (itemPrice * quantity).toFixed(2);
+        }
+
+        updateCartTotals();
+    }
+
+    function updateCartTotals() {
+        let subtotal = 0;
+        const itemInputs = document.querySelectorAll('.num');
+
+        itemInputs.forEach(input => {
+            const quantity = parseInt(input.value, 10);
+            const price = parseFloat(input.getAttribute('data-item-price'));
+
+            if (!isNaN(quantity) && !isNaN(price)) {
+                subtotal += quantity * price;
             }
         });
-    });
-});
 
-document.addEventListener('DOMContentLoaded', function () {
+        const taxRate = 0.1; // 10% tax
+        const tax = subtotal * taxRate;
+        const deliveryFee = 5.0; // Flat delivery fee
 
-    const deliveryRadio = document.getElementById('delivery');
-    const pickupRadio = document.getElementById('pick-up');
-    const addressContainer = document.getElementById('address-container');
+        const total = subtotal + tax + deliveryFee;
 
-    function toggleAddressInput() {
-        if (deliveryRadio.checked) {
-            addressContainer.style.display = 'block';
-        } else {
-            addressContainer.style.display = 'none';
+        document.getElementById('subtotal').textContent = subtotal.toFixed(2);
+        document.getElementById('tax').textContent = tax.toFixed(2);
+        document.getElementById('delivery').textContent = deliveryFee.toFixed(2);
+        document.getElementById('total').textContent = total.toFixed(2);
+
+        const hiddenTotalInput = document.getElementById('hidden-total');
+        if (hiddenTotalInput) {
+            hiddenTotalInput.value = total.toFixed(2);
         }
     }
-
-    deliveryRadio.addEventListener('change', toggleAddressInput);
-    pickupRadio.addEventListener('change', toggleAddressInput);
-
-    toggleAddressInput();
-});
-
-function removeItem(id) {
-    const url = '{{ route('destroyCartItem', ':id') }}'.replace(':id', id);
-
-    try {
-        fetch(url, {
-            method: 'DELETE',
-            headers: {
-                'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                'Content-Type': 'text/plain',
-            },
-        })
-        .then(response => {
-            if (response.ok) {
-                location.reload();
-            } else {
-                return response.text().then(err => {
-                    console.error('Error response:', err);
-                    alert('An error occurred. Please try again.');
-                });
-            }
-        })
-        .catch(error => {
-            console.error('Network or Fetch Error:', error);
-            alert('A network error occurred. Please try again.');
-        });
-    } catch (error) {
-        console.error('Unexpected Error:', error);
-        alert('An unexpected error occurred. Please try again.');
-    }
-}
-
-function adjustQuantity(itemId, change) {
-    const inputField = document.getElementById(`quantity-${itemId}`);
-
-    if (!inputField) {
-        console.error(`Input field for item ${itemId} not found.`);
-        return;
-    }
-
-    let currentQuantity = parseInt(inputField.value, 10);
-    if (isNaN(currentQuantity)) currentQuantity = 1;
-
-    const newQuantity = Math.max(currentQuantity + change, 1);
-
-    inputField.value = newQuantity;
-
-    updateAmount(itemId, parseFloat(inputField.getAttribute('data-item-price')));
-}
-
-function updateAmount(itemId, itemPrice) {
-    if (isNaN(itemPrice)) {
-        console.error(`Invalid item price for item ${itemId}`);
-        return;
-    }
-
-    const inputField = document.getElementById(`quantity-${itemId}`);
-    const quantity = parseInt(inputField.value, 10);
-
-    if (isNaN(quantity) || quantity < 1) {
-        console.error(`Invalid quantity for item ${itemId}`);
-        return;
-    }
-
-    const itemTotalElement = document.getElementById(`item-total-${itemId}`);
-    if (itemTotalElement) {
-        itemTotalElement.textContent = (itemPrice * quantity).toFixed(2);
-    }
-
-    const hiddenTotalInput = document.getElementById(`hidden-total-${itemId}`);
-    if (hiddenTotalInput) {
-        hiddenTotalInput.value = (itemPrice * quantity).toFixed(2);
-    }
-
-    updateCartTotals();
-}
-
-function updateCartTotals() {
-    let subtotal = 0;
-    const itemInputs = document.querySelectorAll('.num');
-
-    itemInputs.forEach(input => {
-        const quantity = parseInt(input.value, 10);
-        const price = parseFloat(input.getAttribute('data-item-price'));
-
-        if (!isNaN(quantity) && !isNaN(price)) {
-            subtotal += quantity * price;
-        }
-    });
-
-    const taxRate = 0.1; // 10% tax
-    const tax = subtotal * taxRate;
-    const deliveryFee = 5.0; // Flat delivery fee
-
-    const total = subtotal + tax + deliveryFee;
-
-    document.getElementById('subtotal').textContent = subtotal.toFixed(2);
-    document.getElementById('tax').textContent = tax.toFixed(2);
-    document.getElementById('delivery').textContent = deliveryFee.toFixed(2);
-    document.getElementById('total').textContent = total.toFixed(2);
-
-    const hiddenTotalInput = document.getElementById('hidden-total');
-    if (hiddenTotalInput) {
-        hiddenTotalInput.value = total.toFixed(2);
-    }
-}
 
 </script>
 @endsection
