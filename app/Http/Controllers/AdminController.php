@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\MenuItem;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class adminController extends Controller
 {
@@ -64,13 +65,29 @@ class adminController extends Controller
             'name' => 'required',
             'price' => 'required',
             'category_id' => 'required',
+            'description' => 'nullable|string',
             'image' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ]);
 
-        $menuItem->update($request->all());
+        $updateData = [
+            'name' => $request->name,
+            'price' => $request->price,
+            'category_id' => $request->category_id,
+            'description' => $request->description,
+        ];
+    
+        if ($request->hasFile('image')) {
+            if ($menuItem->image) {
+                Storage::disk('public')->delete($menuItem->image);
+            }
 
+            $updateData['image'] = $request->file('image')->store('menu_images', 'public');
+        }
+    
+        $menuItem->update($updateData);
+    
         return redirect()->route('admin.dashboard')->with('success', 'Menu item updated successfully');
-    }
+    }    
 
     public function destroy($id) {
         
