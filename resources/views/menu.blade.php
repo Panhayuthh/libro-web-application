@@ -133,88 +133,159 @@
     @guest
     <div class="col-4 menu-item" data-category="{{ $item->category_id }}" data-name="{{ strtolower($item->name) }}">
     @endguest
-        <div class="card h-100 shadow-sm">
-            <form class="row p-3 m-0" action="{{ route('createCartItem') }}" method="post">
-                @csrf
-                @auth
-                <input type="hidden" name="menu_item_id" value="{{ $item->id }}">
-                <input type="hidden" name="cart_id" value="{{ $cart->id }}">
-                @endauth
-                {{-- left column --}}
-                <div class="col-4 ps-0">
-                    <div class="card h-100 border-0">
-                        <img 
-                            src="{{ $item->image ? asset('storage/' . $item->image) : 'https://via.placeholder.com/350x350?text=Image' }}" 
-                            class="card-img h-100 w-100 object-fit-cover" 
-                            alt="Menu Item Image">
-                        @cannot('admin')
-                        <div class="pt-2 input-group w-auto justify-content-center align-items-center">
-                            <input type="button" value="-" class="button-minus border rounded-circle icon-shape icon-sm" data-field="quantity">
-                            <input type="number" step="1" max="10" value="1" name="quantity" class="quantity-field border-0 mx-1 text-center w-25">
-                            <input type="button" value="+" class="button-plus border rounded-circle icon-shape icon-sm " data-field="quantity">
-                        </div>
-                        @endcannot
-                    </div>
-                </div>
-    
-                {{-- right column --}}
-                <div class="col-8">
-                    <div class="card border-0 d-flex flex-column">
-                        <div class="card-body p-0 d-flex flex-column">
-                            <!-- Content -->
-                            <div class="mb-3">
-                                <h5 class="card-title d-flex justify-content-between align-items-center">
-                                    {{ $item->name }}
-                                    <span class="text-primary fw-bold">{{ $item->price }}</span>
-                                </h5>
-                                <p class="card-text m-0">{{ $category }}</p>
-                                <p class="card-text text-muted" style="
-                                    display: -webkit-box;
-                                    -webkit-line-clamp: 3;
-                                    -webkit-box-orient: vertical;
-                                    overflow: hidden;
-                                    min-height: 4.5rem;
-                                ">
-                                    {{ $item->description }}
-                                </p>
-                            </div>
-                        </div>
-                            
-                        {{-- size selector --}}
-                        @cannot('admin')
-                        <div class="row align-items-center mt-auto">
-                            <h6 class="col-auto fw-bold m-0">Size:</h6>
-                            <div class="col d-flex justify-content-center">
-                                <div class="btn-group" role="group" aria-label="Basic radio toggle button group">
-                                    <input type="radio" class="btn-check" name="size_id" id="size_small_{{ $item->id }}" value="1" checked>
-                                    <label class="btn btn-outline-secondary rounded-pill" for="size_small_{{ $item->id }}">Small</label>
-                                </div>
-                                <div class="btn-group ms-3" role="group" aria-label="Basic radio toggle button group">
-                                    <input type="radio" class="btn-check" name="size_id" id="size_large_{{ $item->id }}" value="2">
-                                    <label class="btn btn-outline-secondary rounded-pill" for="size_large_{{ $item->id }}">Large</label>
-                                </div>
-                            </div>
-                        </div>
 
-                        <x-button-pill class="mt-3 btn-primary w-100" type="submit">Add to Cart</x-button-pill>
-                        @endcannot
-                        @can('admin')
-                        <div class="d-flex justify-content-end mt-auto">
-                            <div class="dropdown">
-                                <button class="btn btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                    Actions
-                                </button>
-                                <ul class="dropdown-menu dropdown-menu-end">
-                                    <li><a class="dropdown-item" href="#">Edit</a></li>
-                                    <li><a class="dropdown-item" href="#">Delete</a></li>
-                                </ul>
+        @cannot('admin')
+        <form class="m-0" action="{{ route('createCartItem') }}" method="post">
+            @csrf
+            @auth
+            <input type="hidden" name="menu_item_id" value="{{ $item->id }}">
+            <input type="hidden" name="cart_id" value="{{ $cart->id }}">
+            @endauth
+        @endcannot
+
+            <div class="card h-100 shadow-sm">
+                <div class="row p-3">
+                    {{-- Left column --}}
+                    <div class="col-4">
+                        <div class="card h-100 border-0">
+                            <img 
+                                src="{{ $item->image ? asset('storage/' . $item->image) : 'https://via.placeholder.com/350x350?text=Image' }}" 
+                                class="card-img h-100 w-100 object-fit-cover" 
+                                alt="Menu Item Image">
+                            @cannot('admin')
+                            <div class="pt-2 input-group w-auto justify-content-center align-items-center">
+                                <input type="button" value="-" class="button-minus border rounded-circle icon-shape icon-sm" data-field="quantity">
+                                <input type="number" step="1" max="10" value="1" name="quantity" class="quantity-field border-0 mx-1 text-center w-25">
+                                <input type="button" value="+" class="button-plus border rounded-circle icon-shape icon-sm" data-field="quantity">
                             </div>
+                            @endcannot
                         </div>
-                        @endcan
+                    </div>
+            
+                    {{-- Right column --}}
+                    <div class="col-8">
+                        <div class="card border-0 d-flex flex-column">
+                            <div class="card-body p-0 d-flex flex-column">
+                                <!-- Content -->
+                                <div class="mb-3">
+                                    <h5 class="card-title d-flex justify-content-between align-items-center">
+                                        {{ $item->name }}
+                                        <span class="text-primary fw-bold">{{ $item->price }}</span>
+                                    </h5>
+                                    <p class="card-text m-0">{{ $category }}</p>
+                                    <p class="card-text text-muted" style="
+                                        display: -webkit-box;
+                                        -webkit-line-clamp: 3;
+                                        -webkit-box-orient: vertical;
+                                        overflow: hidden;
+                                        min-height: 4.5rem;
+                                    ">
+                                        {{ $item->description }}
+                                    </p>
+                                </div>
+                            </div>
+                
+                            {{-- Size selector --}}
+                            @cannot('admin')
+                            <div class="row align-items-center mt-auto">
+                                <h6 class="col-auto fw-bold m-0">Size:</h6>
+                                <div class="col d-flex justify-content-center">
+                                    <div class="btn-group" role="group" aria-label="Basic radio toggle button group">
+                                        <input type="radio" class="btn-check" name="size_id" id="size_small_{{ $item->id }}" value="1" checked>
+                                        <label class="btn btn-outline-secondary rounded-pill" for="size_small_{{ $item->id }}">Small</label>
+                                    </div>
+                                    <div class="btn-group ms-3" role="group" aria-label="Basic radio toggle button group">
+                                        <input type="radio" class="btn-check" name="size_id" id="size_large_{{ $item->id }}" value="2">
+                                        <label class="btn btn-outline-secondary rounded-pill" for="size_large_{{ $item->id }}">Large</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <x-button-pill class="mt-3 btn-primary w-100" type="submit">Add to Cart</x-button-pill>
+                            @endcannot
+                
+                            @can('admin')
+                            <div class="d-flex justify-content-end mt-auto">
+                                <div class="dropdown">
+                                    <button class="btn btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                        Actions
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-end">
+                                        <li>
+                                            <button class="dropdown-item" type="button" data-bs-toggle="modal" data-bs-target="#editItemModal" onclick="populateEditModal({{ $item }})">
+                                                <i class="cil-pencil"></i>
+                                                Edit
+                                            </button>
+                                        </li>
+                                        <li>
+                                            <button class="dropdown-item text-danger" type="button" onclick="deleteItem({{ $item->id }})">
+                                                <i class="cil-trash"></i>
+                                                Delete
+                                            </button>
+                                            {{-- <form action="{{ route('menu.destroy', $item->id) }}" method="post">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="dropdown-item text-danger">
+                                                    <i class="cil-trash"></i>
+                                                    Delete
+                                                </button>
+                                            </form> --}}
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <div class="modal fade" id="editItemModal" tabindex="-1" aria-labelledby="editItemModalLabel" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <form id="editItemForm" method="POST">
+                                            @csrf
+                                            @method('PUT')
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="editItemModalLabel">Edit Item</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <div class="mb-3">
+                                                    <label for="editName" class="form-label">Name</label>
+                                                    <input type="text" class="form-control" id="editName" name="name">
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label for="editPrice" class="form-label">Price</label>
+                                                    <input type="number" class="form-control" id="editPrice" name="price">
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label for="editCategory" class="form-label">Category</label>
+                                                    <select class="form-select" id="editCategory" name="category_id">
+                                                        <option value="1">Coffee</option>
+                                                        <option value="2">Non-Coffee</option>
+                                                        <option value="3">Tea</option>
+                                                        <option value="4">Snacks</option>
+                                                    </select>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label for="editDescription" class="form-label">Description</label>
+                                                    <textarea class="form-control" id="editDescription" name="description" rows="3"></textarea>
+                                                </div>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                                <button type="submit" class="btn btn-primary">Save Changes</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            @endcan
+                        </div>
                     </div>
                 </div>
-            </form>
-        </div>
+            </div>
+
+        @cannot('admin')
+        </form>
+        @endcannot
+
     </div>
     @endforeach
 </div>
@@ -333,6 +404,50 @@
 @section('scripts')
 <script>
 
+function populateEditModal(menuItem) {
+    const editForm = document.getElementById('editItemForm');
+    editForm.action = `{{ route('menu.update', ':id') }}`.replace(':id', menuItem.id);
+
+    document.getElementById('editName').value = menuItem.name;
+    document.getElementById('editPrice').value = menuItem.price;
+    document.getElementById('editCategory').value = menuItem.category_id;
+    document.getElementById('editDescription').value = menuItem.description;
+}
+
+function deleteItem(itemId) {
+    if (confirm('Are you sure you want to delete this item?')) {
+        const url = '{{ route('menu.destroy', ':id') }}'.replace(':id', itemId);
+
+        try {
+            fetch(url, {
+                method: 'DELETE',
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Content-Type': 'text/plain',
+                },
+            })
+            .then(response => {
+                if (response.ok) {
+                    alert('Item deleted successfully.');
+                    location.reload();
+                } else {
+                    return response.text().then(err => {
+                        console.error('Error response:', err);
+                        alert('An error occurred. Please try again.');
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Network or Fetch Error:', error);
+                alert('A network error occurred. Please try again.');
+            });
+        } catch (error) {
+            console.error('Unexpected Error:', error);
+            alert('An unexpected error occurred. Please try again.');
+        }
+    }
+}
+
 function filterMenuItems() {
     const searchValue = document.getElementById('search').value.toLowerCase();
     const selectedCategory = document.querySelector('input[name="category"]:checked').value;
@@ -420,6 +535,7 @@ function removeItem(id) {
         alert('An unexpected error occurred. Please try again.');
     }
 }
+
 function adjustQuantity(itemId, change) {
     const inputField = document.getElementById(`quantity-${itemId}`);
 
