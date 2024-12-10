@@ -2,11 +2,31 @@
 
 @section('title', 'History')
 
+
+@guest
+    @section('content')
+        <div class="card mt-5">
+            <div class="card-body">
+                <h5 class="card-title">Please Login</h5>
+                <p class="card-text">You need to login to view your History.</p>
+            </div>
+        </div>
+    @endsection
+
+    @section('sidebar-main')
+        <div class="container-fluid d-flex flex-column vh-100 pb-5 px-4" style="overflow-y: auto; max-height: 100vh;">
+            <h3 class="mt-5"><strong>Order Summary</strong></h3>
+        </div>
+    @endsection
+@endguest
+
 @auth
 @section('content')
 
     {{-- @dd($orders); --}}
 
+<div class="my-5">
+    <h1 class="text-center">Order History</h1>
     @foreach ($orders as $order)
     @php
         $statuses = [
@@ -68,12 +88,14 @@
         </div>
 
     @endforeach
-
+    
+</div>
 @endsection
 
 @section('sidebar-main')
-    <div class="container-fluid d-flex flex-column vh-100 pb-5 px-4" style="overflow-y: auto; max-height: 100vh;">
+<div class="container-fluid d-flex flex-column vh-100 pb-5 px-4" style="overflow-y: auto; max-height: 100vh;">
         <h3 class="mt-5"><strong>Order Summary</strong></h3>
+        @cannot('admin')
         <div class="card mt-3">
             <div class="card-body">
                 <h5 class="card-title">Customer Name: </h5>
@@ -83,6 +105,33 @@
                 <p class="card-text">012892633</p>
             </div>
         </div>
+        @endcannot
+        @can('admin')
+        @foreach ($orders as $order)
+            @php
+                $total = 0;
+                $totalOrder = 0;
+
+                foreach ($order->orderItems as $item) {
+                    $total += $item->menuItem->price * $item->quantity;
+                }
+
+                $totalOrder += count($orders);
+            @endphp
+        @endforeach
+        <div class="card mt-3">
+            <div class="card-body">
+                <h5 class="card-title">Total Amount: </h5>
+                <p class="card-text">{{ $total }}</p>
+            </div>
+        </div>
+        <div class="card mt-3">
+            <div class="card-body">
+                <h5 class="card-title">Total Orders: </h5>
+                <p class="card-text">{{ $totalOrder }}</p>
+            </div>
+        </div>
+        @endcan
     </div>
 @endsection
 @endauth

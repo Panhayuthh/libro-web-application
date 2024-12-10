@@ -16,7 +16,7 @@ Route::get('/home', function () {
     return view('home');
 })->name('home');
 
-Route::get('/history', [OrderController::class, 'history'])->name('history')->middleware('auth');
+Route::get('/history', [OrderController::class, 'history'])->name('history')    ;
 Route::get('/menu', [MenuItemController::class, 'index'])->name('menu');
 
 Route::group(['prefix' => 'auth'], function () {
@@ -35,7 +35,7 @@ Route::group(['prefix' => 'menu', 'middleware' => ['auth','can:add-to-cart']], f
     Route::delete('/cart/item/{cartItem}', [CartController::class, 'destroyCartItem'])->name('destroyCartItem');
 });
 
-Route::group(['prefix' => 'order', 'middleware' => ['auth','can:add-to-cart']], function () {
+Route::group(['prefix' => 'order'], function () {
     Route::get('/', [OrderController::class, 'index'])->name('order');
     Route::post('/', [OrderController::class, 'store'])->name('order.store');
 });
@@ -45,6 +45,9 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth','is_admin']], functio
     Route::post('/menu/create', [adminController::class, 'store'])->name('menu.store');
     Route::put('/menu/{menuItem}/edit', [adminController::class, 'update'])->name('menu.update');
     Route::delete('/menu/{menuItem}', [adminController::class, 'destroy'])->name('menu.destroy');
+    Route::get('/order', [adminController::class, 'order'])->name('admin.order');
+    Route::get('/history', [adminController::class, 'history'])->name('admin.history');
+    Route::put('/order/status/{order}', [adminController::class, 'updateOrderStatus'])->name('order.status');
 });
 
 // Route::get('/cart', [CartController::class, 'show'])->name('cart');
