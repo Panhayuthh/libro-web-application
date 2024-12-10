@@ -58,12 +58,6 @@ class adminController extends Controller
         }
     }
 
-    public function edit(MenuItem $menuItem)
-    {
-        // return view('admin.edit', compact('menuItem'));
-        return $menuItem;
-    }
-
     public function update(Request $request, MenuItem $menuItem)
     {
         $request->validate([
@@ -75,10 +69,11 @@ class adminController extends Controller
 
         $menuItem->update($request->all());
 
-        return $menuItem;
+        return redirect()->route('admin.dashboard')->with('success', 'Menu item updated successfully');
     }
 
-    public function deleteItem($id) {
+    public function destroy($id) {
+        
         try {
             $menuItem = MenuItem::findOrFail($id);
     

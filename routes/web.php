@@ -43,9 +43,8 @@ Route::group(['prefix' => 'order', 'middleware' => ['auth','can:add-to-cart']], 
 Route::group(['prefix' => 'admin', 'middleware' => ['auth','is_admin']], function() {
     Route::get('/dashboard', [adminController::class, 'index'])->name('admin.dashboard');
     Route::post('/menu/create', [adminController::class, 'store'])->name('menu.store');
-    Route::get('/menu/{menuItem}/edit', [adminController::class, 'edit']);
-    Route::put('/menu/{menuItem}/edit', [adminController::class, 'update']);
-    Route::delete('/menu/{menuItem}', [adminController::class, 'destroy']);
+    Route::put('/menu/{menuItem}/edit', [adminController::class, 'update'])->name('menu.update');
+    Route::delete('/menu/{menuItem}', [adminController::class, 'destroy'])->name('menu.destroy');
 });
 
 // Route::get('/cart', [CartController::class, 'show'])->name('cart');
