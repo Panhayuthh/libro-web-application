@@ -109,7 +109,7 @@ class adminController extends Controller
     public function order()
     {
         $order = Order::with(['orderItems.menuItem'])
-            // ->whereDate('created_at', Carbon::today())
+            ->whereDate('created_at', Carbon::today())
             ->orderBy('created_at', 'desc')
             ->get();
 
