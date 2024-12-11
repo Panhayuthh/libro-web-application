@@ -18,8 +18,7 @@ class PaymentFactory extends Factory
     {
         return [
             'order_id' => fake()->numberBetween(1, 2),
-            'amount' => fake()->randomFloat(2, 1, 100),
-            'payment_method' => fake()->randomElement(['cash', 'credit_card', 'qris'])
+            'payment_method' => fake()->numberBetween(1, 2),
         ];
     }
 }

@@ -14,8 +14,7 @@ return new class extends Migration
         Schema::create('payments', function (Blueprint $table) {
             $table->id();
             $table->foreignId('order_id')->constrained()->onDelete('cascade')->onUpdate('cascade');
-            $table->string('payment_method');
-            $table->decimal('amount', 10, 2);
+            $table->integer('payment_method')->comment('1: QRIS, 2: Pay Later');
             $table->timestamps();
         });
     }

@@ -28,5 +28,9 @@ class AuthServiceProvider extends ServiceProvider
         Gate::define('add-to-cart', function ($user) {
             return Auth::check() && !$user->is_admin;
         });
+
+        Gate::define('pay-order', function ($user) {
+            return Auth::check() && !$user->is_admin;
+        });
     }
 }
