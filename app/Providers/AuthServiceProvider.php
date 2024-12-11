@@ -30,6 +30,7 @@ class AuthServiceProvider extends ServiceProvider
         });
 
         Gate::define('pay-order', function ($user) {
+            return Auth::check() && !$user->is_admin;
         });
     }
 }
