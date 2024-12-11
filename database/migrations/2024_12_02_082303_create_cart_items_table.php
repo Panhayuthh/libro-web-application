@@ -17,7 +17,7 @@ return new class extends Migration
             $table->foreignId('menu_item_id')->constrained()->onDelete('cascade')->onUpdate('cascade');
             $table->integer('quantity');
             $table->integer('size_id')->comment('1: small, 2: large');
-            $table->unique(['cart_id', 'menu_item_id']);
+            $table->unique(['cart_id', 'menu_item_id', 'size_id']);
             $table->timestamps();
         });
     }
