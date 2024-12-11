@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Order;
 use App\Models\OrderItem;
+use App\Models\Payment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -62,6 +63,11 @@ class OrderController extends Controller
             }
         }
 
+        Payment::create([
+            'order_id' => $order->id,
+            'payment_method' => $request->payment_method,
+        ]);
+
         try {
             $deleteCart = app(CartController::class)->destroyCart($request->cart_id);
         } catch (\Exception $e) {
@@ -69,5 +75,22 @@ class OrderController extends Controller
         }
 
         return redirect()->back()->with('success', 'Order created successfully');
+    }
+
+    public function createPayment(Request $request) {
+
+        dd($request->all());
+
+        $request->validate([
+            'order_id' => 'required:exists:orders,id',
+            'payment_method' => 'required',
+        ]);
+
+        Payment::create([
+            'order_id' => $request->order_id,
+            'payment_method' => $request->payment_method,
+        ]);
+
+        return redirect()->back()->with('success', 'Payment created successfully');
     }
 }

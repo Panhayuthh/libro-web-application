@@ -40,6 +40,10 @@ Route::group(['prefix' => 'order'], function () {
     Route::post('/', [OrderController::class, 'store'])->name('order.store');
 });
 
+Route::group(['prefix' => 'payment', 'middleware' => ['auth','can:pay-order']], function () {
+    Route::post('/', [OrderController::class, 'createPayment'])->name('createPayment');
+});
+
 Route::group(['prefix' => 'admin', 'middleware' => ['auth','is_admin']], function() {
     Route::get('/dashboard', [adminController::class, 'index'])->name('admin.dashboard');
     Route::post('/menu/create', [adminController::class, 'store'])->name('menu.store');

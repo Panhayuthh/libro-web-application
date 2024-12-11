@@ -307,6 +307,24 @@
                 </div>
             </div>
         </div>
+
+        <div class="col-12 mt-3">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <span>Payment Method</span>
+                        <select name="payment_method" class="form-select">
+                            <option value="1">QR</option>
+                            <option value="2">Pay Later</option>
+                        </select>
+                    </div>
+                    <div class="card mt-3">
+                        <img src="https://via.placeholder.com/350x350?text=QR" class="card-img h-100 w-100 object-fit-cover">
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <input type="hidden" name="total" id="hidden-total" value="{{ number_format($total, 2) }}">
 
         {{-- Checkout --}}
@@ -320,6 +338,38 @@
 
 @section('scripts')
 <script>
+
+    document.addEventListener('DOMContentLoaded', function () {
+
+    const deliveryRadio = document.getElementById('delivery');
+    const pickupRadio = document.getElementById('pick-up');
+    const addressContainer = document.getElementById('address-container');
+    const paymentMethodSelect = document.querySelector('select[name="payment_method"]');
+    const imageCard = document.querySelector('.card.mt-3');
+
+    function toggleAddressInput() {
+        if (deliveryRadio.checked) {
+            addressContainer.style.display = 'block';
+        } else {
+            addressContainer.style.display = 'none';
+        }
+    }
+
+    function toggleImageCard() {
+        if (paymentMethodSelect.value === "1") {
+            imageCard.style.display = 'block';
+        } else {
+            imageCard.style.display = 'none';
+        }
+    }
+
+    deliveryRadio.addEventListener('change', toggleAddressInput);
+    pickupRadio.addEventListener('change', toggleAddressInput);
+    paymentMethodSelect.addEventListener('change', toggleImageCard);
+
+    toggleAddressInput();
+    toggleImageCard();
+    });
 
     function populateEditModal(menuItem) {
         const editForm = document.getElementById('editItemForm');
