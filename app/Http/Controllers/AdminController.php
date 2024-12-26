@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Categories;
 use App\Models\MenuItem;
 use App\Models\Order;
 use Carbon\Carbon;
@@ -17,9 +18,26 @@ class adminController extends Controller
         // return MenuItem::all();
     }
 
-    public function create()
+    public function storeCategory(Request $request)
     {
-        // return view('admin.create');
+        $request->validate([
+            'name' => 'required',
+        ]);
+
+        if (Categories::where('name', $request->name)->exists()) {
+            return redirect()->back()->with('error', 'Category already exists');
+        }
+
+        $category = new Categories([
+            'name' => $request->name,
+        ]);
+
+        try {
+            $category->save();
+            return redirect()->route('admin.dashboard')->with('success', 'Category added successfully');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', $e->getMessage());
+        }
     }
 
     public function store(Request $request)

@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Categories;
 use App\Models\Payment;
 use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
@@ -26,6 +27,22 @@ class DatabaseSeeder extends Seeder
         ]);
 
         User::factory(10)->create();
+
+        Categories::factory()->create([
+            'name' => 'Coffee',
+        ]);
+
+        Categories::factory()->create([
+            'name' => 'Non-coffee',
+        ]);
+
+        Categories::factory()->create([
+            'name' => 'Tea',
+        ]);
+
+        Categories::factory()->create([
+            'name' => 'Snacks',
+        ]);
         
         $this->call([
             MenuItemSeeder::class,

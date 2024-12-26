@@ -16,13 +16,12 @@
                         <label for="itemCategory" class="form-label">Category</label>
                         <select class="form-select" id="itemCategory" name="category_id">
                             <option value="">Select a category</option>
-                            <option value="1">Coffee</option>
-                            <option value="2">Non-Coffee</option>
-                            <option value="3">Tea</option>
-                            <option value="4">Snacks</option>
+                            @foreach ($categories as $category)
+                                <option value="{{ $category->id }}">{{ $category->name }}</option>
+                            @endforeach
                         </select>
                     </div>
-                    <x-form-input type="number" name="price" label="Price" placeholder="Enter item price" />
+                    <x-form-input type="float" name="price" label="Price" placeholder="Enter item price" />
                     <div class="mb-3">
                         <label for="itemDescription" class="form-label">Description</label>
                         <textarea class="form-control" id="itemDescription" name="description" rows="3"></textarea>
