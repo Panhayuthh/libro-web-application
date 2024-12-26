@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Cart;
+use App\Models\Categories;
 use App\Models\Category;
 use App\Models\MenuItem;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -14,11 +15,13 @@ class menuItemController extends Controller
     public function index()
     {
         //get all menu items
-        $menuItems = MenuItem::all();
+        $categories = Categories::all();
+        $menuItems = MenuItem::with('category')->get();
         
         //if user is not logged in, show menu without cart
         if (!Auth::check()) {
             return view('menu', [
+                'categories' => $categories,
                 'menuItems' => $menuItems,
             ]);
         }
@@ -27,6 +30,7 @@ class menuItemController extends Controller
         $cartData = app(CartController::class)->show();
 
         return view('menu', [
+            'categories' => $categories,
             'menuItems' => $menuItems,
             'cart' => $cartData['cart'],
             'cartItems' => $cartData['cartItems'],

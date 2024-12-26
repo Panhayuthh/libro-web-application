@@ -26,43 +26,41 @@
 
 
 {{-- @dd($cartItems) --}}
-
+{{-- @dd($categories) --}}
 {{-- @dd($menuItems) --}}
 
-<div class="row g-3 mt-3">
+<div class="row g-3 mt-1">
     <div class="col btn-group" role="group" aria-label="Category toggle button group">
         <input type="radio" class="btn-check" name="category" id="all" value="all" autocomplete="off" checked>
         <label class="btn btn-outline-primary rounded-pill" for="all">All</label>
     </div>
     
-    <div class="col btn-group" role="group" aria-label="Category toggle button group">
-        <input type="radio" class="btn-check" name="category" id="coffee" value="1" autocomplete="off">
-        <label class="btn btn-outline-primary rounded-pill" for="coffee">Coffee</label>
-    </div>
+    @foreach ($categories as $category)
 
     <div class="col btn-group" role="group" aria-label="Category toggle button group">
-        <input type="radio" class="btn-check" name="category" id="non-coffee" value="2" autocomplete="off">
-        <label class="btn btn-outline-primary rounded-pill" for="non-coffee">Non-Coffee</label>
-    </div>
-    
-    <div class="col btn-group" role="group" aria-label="Category toggle button group">
-        <input type="radio" class="btn-check" name="category" id="tea" value="3" autocomplete="off">
-        <label class="btn btn-outline-primary rounded-pill" for="tea">Tea</label>
+        <input type="radio" class="btn-check" name="category" id="{{ $category->name }}" value="{{ $category->id }}" autocomplete="off">
+        <label class="btn btn-outline-primary rounded-pill" for="{{ $category->name }}">{{ $category->name }}</label>
     </div>
 
-    <div class="col btn-group" role="group" aria-label="Category toggle button group">
-        <input type="radio" class="btn-check" name="category" id="snacks" value="4" autocomplete="off">
-        <label class="btn btn-outline-primary rounded-pill" for="snacks">Snacks</label>
-    </div>
+    @endforeach
 </div>
 
 <h1 class="my-3">Menu</h1>
 
 @can('admin')
-    <div class="mb-3">
-        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addItemModal">
-            Add Item
-        </button>
+    <div class="d-flex justify-content-start">
+        <div class="mb-3">
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addCategoryModal">
+                Add Category
+            </button>
+        </div>
+    
+        @include('components.create-category-modal')
+        <div class="ms-3 mb-3">
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addItemModal">
+                Add Item
+            </button>
+        </div>
     </div>
 
     <!-- Add Item Modal -->
@@ -71,16 +69,6 @@
 
 <div class="row justify-content-center g-3">
     @foreach ($menuItems as $item)
-    @php
-        $categories = [
-            1 => 'Coffee',
-            2 => 'Non-Coffee',
-            3 => 'Tea',
-            4 => 'Snacks',
-        ];
-
-        $category = $categories[$item->category_id] ?? 'Unknown';
-    @endphp
     @can('add-to-cart')
     <div class="col-5 menu-item" data-category="{{ $item->category_id }}" data-name="{{ strtolower($item->name) }}"> 
     @endcan
@@ -129,7 +117,7 @@
                                         {{ $item->name }}
                                         <span class="text-primary fw-bold">{{ $item->price }}</span>
                                     </h5>
-                                    <p class="card-text m-0">{{ $category }}</p>
+                                    <p class="card-text m-0">{{ $item->category->name }}</p>
                                     <p class="card-text text-muted" style="
                                         display: -webkit-box;
                                         -webkit-line-clamp: 3;

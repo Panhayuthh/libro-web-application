@@ -46,6 +46,7 @@ Route::group(['prefix' => 'payment', 'middleware' => ['auth','can:pay-order']], 
 
 Route::group(['prefix' => 'admin', 'middleware' => ['auth','is_admin']], function() {
     Route::get('/dashboard', [adminController::class, 'index'])->name('admin.dashboard');
+    Route::post('/category/create', [adminController::class, 'storeCategory'])->name('category.store');
     Route::post('/menu/create', [adminController::class, 'store'])->name('menu.store');
     Route::put('/menu/{menuItem}/edit', [adminController::class, 'update'])->name('menu.update');
     Route::delete('/menu/{menuItem}', [adminController::class, 'destroy'])->name('menu.destroy');

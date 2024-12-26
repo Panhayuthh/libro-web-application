@@ -15,15 +15,14 @@
                     </div>
                     <div class="mb-3">
                         <label for="editPrice" class="form-label">Price</label>
-                        <input type="number" class="form-control" id="editPrice" name="price">
+                        <input type="float" class="form-control" id="editPrice" name="price">
                     </div>
                     <div class="mb-3">
                         <label for="editCategory" class="form-label">Category</label>
                         <select class="form-select" id="editCategory" name="category_id">
-                            <option value="1">Coffee</option>
-                            <option value="2">Non-Coffee</option>
-                            <option value="3">Tea</option>
-                            <option value="4">Snacks</option>
+                            @foreach ($categories as $category)
+                                <option value="{{ $category->id }}">{{ $category->name }}</option>
+                            @endforeach
                         </select>
                     </div>
                     <div class="mb-3">
